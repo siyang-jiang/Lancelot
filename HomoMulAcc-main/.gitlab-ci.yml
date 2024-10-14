@@ -1,0 +1,47 @@
+stages:
+  - build test
+  - test
+  - build bench
+  - bench
+
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+
+build test on A100:
+  stage: build test
+  tags:
+    - gpu, a100
+  script:
+    - cmake -S . -B build -DCMAKE_CUDA_ARCHITECTURES=80-real
+    - cmake --build build -j
+  artifacts:
+    paths:
+      - build/bin
+      - build/lib
+
+test BFV on A100:
+  stage: test
+  tags:
+    - gpu, a100
+  script:
+    - ./build/bin/example_context 1
+  dependencies:
+    - build test on A100
+
+test BGV on A100:
+  stage: test
+  tags:
+    - gpu, a100
+  script:
+    - ./build/bin/example_context 2
+  dependencies:
+    - build test on A100
+
+test CKKS on A100:
+  stage: test
+  tags:
+    - gpu, a100
+  script:
+    - ./build/bin/example_context 3
+  dependencies:
+    - build test on A100
