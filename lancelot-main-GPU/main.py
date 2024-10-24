@@ -29,6 +29,16 @@ def reshape_flat_list_to_state_dict(flat_list, state_dict_template):
     return new_state_dict
 
 
+def flatten_dict(d, parent_key='', sep='.'):
+    items = []
+    for k, v in d.items():
+        new_key = f"{parent_key}{sep}{k}" if parent_key else k
+        if isinstance(v, dict):
+            items.extend(flatten_dict(v, new_key, sep=sep).items())
+        else:
+            items.append((new_key, v))
+    return dict(items)
+
 
 if __name__ == '__main__':
     # parse args
@@ -51,13 +61,8 @@ if __name__ == '__main__':
     torch.manual_seed(args.seed)
     torch.cuda.manual_seed_all(args.seed)
 
-    #args.num_clients =7         #change client
-   # args.method = 'trimmed_mean'   #change method
-
     dataset_train, dataset_test, dataset_val = load_data(args)
 
-
-    # early stopping hyperparameters
     cnt = 0
     check_acc = 0
 
@@ -111,51 +116,43 @@ if __name__ == '__main__':
                 local_traintime+=endtime-starttime
 
                 w_locals.append(copy.deepcopy(w))
-        print("local train time", local_traintime)
+        print("local train time on clients", local_traintime)
 
-        # update global weights
-        if args.method == 'fedavg':
-            w_glob = fedavg(w_locals)
-        elif args.method== 'fedavg_5wei':
-            w_glob = fedavg_5wei(w_locals)
-        elif args.method == 'krum':
-            #w_glob, _ = krum(w_locals, compromised_num, args)
-            #w_glob = GPU_krum(w_locals, compromised_num, args)
-            print("test____________________begin")
-        elif args.method == 'trimmed_mean':
-            w_glob = trimmed_mean(w_locals, compromised_num, args)
-        elif args.method == 'fang':
-            w_glob = fang(w_locals, dataset_val, compromised_num, args)
-        elif args.method == 'dca':
-            w_glob = dummy_contrastive_aggregation(w_locals, compromised_num, copy.deepcopy(net_glob), args)
+        if args.method == 'krum':
+            print("We test the krum method, first in plaintext and then in cipertext.")     
         else:
             exit('Error: unrecognized aggregation technique')
-
-        # copy weight to net_glob
-
-        # net_glob.load_state_dict(w_glob)
-        # test_acc, test_loss = test_img(net_glob.to(args.device), dataset_test, args)
-
-        print("test____________________begin")
         
         w_glob1, _ = krum(w_locals, compromised_num, args)
         
-        # w_glob_flat = GPU_krum(w_locals, compromised_num, args)
-        # w_glob_reshaped = reshape_flat_list_to_state_dict(w_glob_flat, w_glob1)
-        # net_glob.load_state_dict(w_glob_reshaped)
-        
-        net_glob.load_state_dict(w_glob1)
-        test_acc, test_loss = test_img(net_glob.to(args.device), dataset_test, args)
-        
-  
+        if args.cipher_open:
+            w_glob_flat = GPU_krum(w_locals, compromised_num, args)
+            w_glob_reshaped = reshape_flat_list_to_state_dict(w_glob_flat, w_glob1)
 
-        args.debug=True
-        if args.debug:
-            print(f"Round: {iter}")
-            print(f"Test accuracy: {test_acc}")
-            print(f"Test loss: {test_loss}")
-            print(f"Check accuracy: {check_acc}")
-            print(f"patience: {cnt}")
+            flattened_dict_plain, flatten_dict_cipher = flatten_dict(w_glob1), flatten_dict(w_glob_reshaped)
+
+            model_list_w_glob1 = list(flattened_dict_plain.values())
+            model_list_w_glob2 = list(flatten_dict_cipher.values())
+            error = 0
+
+            tmp = 1
+            for x , y in zip(model_list_w_glob1, model_list_w_glob2):
+                shape_list = list(x.shape)
+                for item in shape_list:
+                    tmp *= item 
+                x_tmp = x.cpu().detach().numpy()
+                y_tmp = y.cpu().detach().numpy()
+                error_tmp = torch.norm(x.float()-y.float()).to(torch.float64)
+                tmp = float(tmp)
+                error += (error_tmp / (tmp))
+            print("Check the error the model between the two methods: ", (error / len(model_list_w_glob1)) ) 
+
+        if args.cipher_open:
+            net_glob.load_state_dict(w_glob_reshaped)
+        else:
+            net_glob.load_state_dict(w_glob1)
+
+        test_acc, test_loss = test_img(net_glob.to(args.device), dataset_test, args)
 
         if check_acc == 0:
             check_acc = test_acc
