@@ -116,16 +116,22 @@ if __name__ == '__main__':
                 local_traintime+=endtime-starttime
 
                 w_locals.append(copy.deepcopy(w))
-        print("local train time on clients", local_traintime)
 
         if args.method == 'krum':
             print("We test the krum method, first in plaintext and then in cipertext.")     
         else:
             exit('Error: unrecognized aggregation technique')
         
+        print("+------------------------------------------------+")
+        print("+------------ Train on the plaintext. -----------+") 
         w_glob1, _ = krum(w_locals, compromised_num, args)
+        print("+-------- End on training the plaintext. --------+") 
+
+        print("+------------------------------------------------+")
         
         if args.cipher_open:
+            print("+-------- Train on the ciphertext. ----------+") 
+
             w_glob_flat = GPU_krum(w_locals, compromised_num, args)
             w_glob_reshaped = reshape_flat_list_to_state_dict(w_glob_flat, w_glob1)
 
@@ -133,9 +139,10 @@ if __name__ == '__main__':
 
             model_list_w_glob1 = list(flattened_dict_plain.values())
             model_list_w_glob2 = list(flatten_dict_cipher.values())
+            
             error = 0
-
             tmp = 1
+            
             for x , y in zip(model_list_w_glob1, model_list_w_glob2):
                 shape_list = list(x.shape)
                 for item in shape_list:
@@ -145,7 +152,11 @@ if __name__ == '__main__':
                 error_tmp = torch.norm(x.float()-y.float()).to(torch.float64)
                 tmp = float(tmp)
                 error += (error_tmp / (tmp))
-            print("Check the error the model between the two methods: ", (error / len(model_list_w_glob1)) ) 
+
+            # Devide by the number of elements in the model
+            error = error / len(model_list_w_glob1)
+            print(f"Check the error the model between the two methods: {error}", flush=True)  
+            print("+--------- End on the ciphertext --------------+")
 
         if args.cipher_open:
             net_glob.load_state_dict(w_glob_reshaped)

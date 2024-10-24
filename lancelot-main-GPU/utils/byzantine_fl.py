@@ -159,11 +159,7 @@ def GPU_compute_pair_distance(msg1, msg2,context,pk,sk,glk,rlk,encoder,scale):
     encrypt_time=0
 
     for x1, x2 in zip(msg1, msg2):
-        #x2 = [x * 100 for x in x2]
-        #x1 = [x * 100 for x in x1]
 
-        #x1=[float(i) for i in range(0,4096)]
-        #x2 = [float(i+i) for i in range(0, 4096)]
         start_inloop = time.time()
         pt1 = encoder.encode(context, x1, scale)
         pt2 = encoder.encode(context, x2, scale)
@@ -231,7 +227,7 @@ def GPU_compute_pair_distance(msg1, msg2,context,pk,sk,glk,rlk,encoder,scale):
 
         pt_dec = sk.decrypt(context, tmp1)
         result111 = encoder.decode(context, pt_dec)
-        print(sum(result111))
+        # print(sum(result111))
         start_inloop = time.time()
         tmp_rot = cahel.ciphertext(context)
 
@@ -252,12 +248,12 @@ def GPU_compute_pair_distance(msg1, msg2,context,pk,sk,glk,rlk,encoder,scale):
             result22 = encoder.decode(context, pt_dec)
 
         end_inloop = time.time()
-        print(f"hoisting time is {end_inloop - start_inloop}")
+        # print(f"hoisting time is {end_inloop - start_inloop}")
     else:
 
          pt_dec = sk.decrypt(context, tmp1)
          result111 = encoder.decode(context, pt_dec)
-         print(sum(result111))
+        #  print(sum(result111))
          tmp_rot = cahel.ciphertext(context)
          start_inloop = time.time()
          for idx in rotation_key: # Check the demension
@@ -274,11 +270,6 @@ def GPU_compute_pair_distance(msg1, msg2,context,pk,sk,glk,rlk,encoder,scale):
              result22 = encoder.decode(context, pt_dec)
 
          end_inloop = time.time()
-         print(f"Rotation time is {end_inloop - start_inloop}")
-    print("lazy time", lazy_time)
-    print("no_lazy time",no_lazy_time)
-    print("encrpyt time",encrypt_time)
-    print("encode time",encode_time)
 
     global all_encrypt_time
     global all_encode_time
@@ -294,7 +285,7 @@ def GPU_compute_pair_distance(msg1, msg2,context,pk,sk,glk,rlk,encoder,scale):
     cipher_distance = tmp1
     pt_dec = sk.decrypt(context, tmp1)
     result1 = encoder.decode(context, pt_dec)
-    print(result1[0])
+    # print(result1[0])
     return cipher_distance
 
 
@@ -384,7 +375,7 @@ def computing_distance_cipher(cryptocontext, keyPair, w_locals, args):
     # split the vector
 
     num_clients, weight_len = len(vectors), len(vectors[0])
-    print(num_clients, weight_len, type(vectors[0]))
+    # print(num_clients, weight_len, type(vectors[0]))
 
     # padding
     ringDim = cryptocontext.GetRingDimension()
@@ -514,21 +505,15 @@ def GPU_decrypt_sort_mask(context,pk,sk,encoder,scale,distance_matrix):
 
         for idy in range(num_clients):
             cahel.add_inplace(context,tmp, distance_matrix[idx][idy])  # clients adding
-        print(idx)
         distance_final[idx] = tmp
         pt_dec = sk.decrypt(context,tmp)
         p_distance_tmp=encoder.decode(context, pt_dec)
         #p_distance_tmp.SetLength(1)  # scale ???
         p_distance.append(p_distance_tmp[0])
-    print(p_distance)
-    # TODO
-    # SORT p_distance and produce the encrypted mask; One Checkpoint
-    # based on a sorted array, produce a mask;
+    # print(p_distance)
 
     p_distance_sort=np.argsort(p_distance)
-    print(p_distance_sort)
-
-    #sort_list = [i for i in range(num_clients)]
+    # print(p_distance_sort)
 
     mask = [[] for idx in range(num_clients)]
 
@@ -542,13 +527,11 @@ def GPU_decrypt_sort_mask(context,pk,sk,encoder,scale,distance_matrix):
     for idx in range(num_clients):
         mask[idx][p_distance_sort[idx]] = tmp1  # shape of mask is ===> [10, 10, Nshot] duijiao juzhen
 
-    print(f"The shape of Mask is {len(mask), len(mask[0])},  RingDemension_divide_2")
+    print(f"The shape of Mask is {len(mask), len(mask[0])}")
     return mask,p_distance_sort[0]
 
 def GPU_mul_mask_weight(context,pk,encoder,scale,rlk,vectors_final,mask,sk):
     client_num, word_num, word_length = len(vectors_final), len(vectors_final[0]), len(vectors_final[0][0])
-    print(f"client_num, word_num, word_length is {client_num, word_num, word_length}")
-    vectors_final_new, vectors_final_cipher = copy.deepcopy(vectors_final), copy.deepcopy(vectors_final)
 
     vectors_final_reshape = [[] for idx in range(word_num)]
 
@@ -558,10 +541,6 @@ def GPU_mul_mask_weight(context,pk,encoder,scale,rlk,vectors_final,mask,sk):
     for idx in range(client_num):
         for idy in range(word_num):
             vectors_final_reshape[idy][idx][:] = vectors_final[idx][idy][:]
-
-    if DEBUG_MODE:
-        print(
-            f"New shape in {len(vectors_final_reshape), len(vectors_final_reshape[0]), len(vectors_final_reshape[0][0])}")
 
     start = time.time()
 
@@ -577,13 +556,11 @@ def GPU_mul_mask_weight(context,pk,encoder,scale,rlk,vectors_final,mask,sk):
     tmp4lazy=pk.encrypt_asymmetric(context, pt_tmp1)
     cahel.square_inplace(context, tmp4lazy)
 
-    # for idx in range(num_clients):
-    #     mask[idx] = [tmp1 for idy in range(num_clients)]
     w_new=[]
     for idx, ciph_tmp_1 in enumerate(mask):  # 10 , 10, cipher
         if idx>0:
             break
-        for idy, msg1 in tqdm(enumerate(vectors_final_reshape)):  # 5000+ , 10, cipher
+        for idy, msg1 in (enumerate(vectors_final_reshape)):  # 5000+ , 10, cipher
             for ct1, msg_item in zip(ciph_tmp_1, msg1):
 
                 pt2 = encoder.encode(context, msg_item, scale)
@@ -608,12 +585,8 @@ def GPU_mul_mask_weight(context,pk,encoder,scale,rlk,vectors_final,mask,sk):
 
             w_new=w_new+resultadd
 
-    # if lazy_relin_flag:
-
-        # vectors_final_new[idx][idy] = zero_tmp_inner_loop
-
     end = time.time()
-    print(f"Mask Multiplication Time is {end - start}")
+    print(f"Mask Multiplication Time is: {end - start:.4f}")
 
     return w_new
 
@@ -681,7 +654,7 @@ def mul_mask_weight(cryptocontext, keyPair, vectors_final, mask):
 
 
 def GPU_init():
-    # ckks tet
+    # ckks set
     log_n = log_Nslot+1
     n = 2 ** log_n
     modulus_chain = [60, 40, 40,60]
@@ -715,13 +688,12 @@ def GPU_init():
 
 
 def GPU_computing_distance_cipher(context,pk,sk,glk,rlk,encoder, scale, w_locals):
-    simple_ball = 0
-    start_inloop = time.time()
+
     vectors = multi_vectorization_cipher(w_locals)  # shape is [Num_clients, fatten the weights]. For example ,[10, xxxx, xxxx]
     # split the vector
 
     num_clients, weight_len = len(vectors), len(vectors[0])
-    print(num_clients, weight_len, type(vectors[0]))
+    # print(num_clients, weight_len, type(vectors[0]))
 
     # padding
     ringDim = Nslot*2
@@ -738,21 +710,16 @@ def GPU_computing_distance_cipher(context,pk,sk,glk,rlk,encoder, scale, w_locals
 
     # split
     vectors_final = [[] for i in range(num_clients)]
-    # raise ValueError("1")
     for idx in range(num_clients):
         vectors_final[idx] = np.array_split(vectors_new[idx], (whole_len // numSlots))  # [[ndarray], [], []]
 
-    print(len(vectors_final[0]), len(vectors_final[0][0]), type(vectors_final[0]),
-          type(vectors_final[0][0]))  # 5654, 4096
+    DEBUG_MODE = 0
+    if DEBUG_MODE:
+        print(len(vectors_final[0]), len(vectors_final[0][0]), type(vectors_final[0]), type(vectors_final[0][0]))  # 5654, 4096
 
     distance_matrix = [[] for i in range(num_clients)]
     for i in range(num_clients):
         distance_matrix[i] = [[] for i in range(num_clients)]
-
-    distance_matrix_tmp_element = []
-
-    end_inloop = time.time()
-    print(f"vector init is {end_inloop - start_inloop}")
 
     distance_matrix = [[] for i in range(num_clients)]
     for i in range(num_clients):
@@ -760,28 +727,14 @@ def GPU_computing_distance_cipher(context,pk,sk,glk,rlk,encoder, scale, w_locals
 
     start1 = time.time()
 
-    #for msg in numerate(vectors_final):
-
-
-    for i, msg1 in tqdm(enumerate(vectors_final)):
+    for i, msg1 in (enumerate(vectors_final)):
         for j, msg2 in enumerate(vectors_final[i:]):
                 start = time.time()
                 distance_matrix[i][j + i] = distance_matrix[j + i][i] = GPU_compute_pair_distance(msg1, msg2, context, pk, sk, glk, rlk, encoder, scale)
                 end = time.time()
-                print(f"yici Distance Computing Time is {end - start}")
     end1 = time.time()
 
-    print(f"all Distance Computing Time is {end1 - start1}")
-
-    print(f"all rota  Time is {all_rota_time}")
-    print(f"all encrypt  Time is {all_encrypt_time}")
-    print(f"all encode  Time is {all_encode_time}")
-    print(f"all lazy  Time is {all_lazy_time}")
-
-    if simple_ball:
-        pass
-        # TODO
-
+    print(f"All [Distance Computing, Rotation, Encrypt, Encode, Lazy Relin Time] is: [{end1 - start1:.2f}, {all_rota_time:.2f}, {all_encrypt_time:.2f}, {all_encode_time:.2f}, {all_lazy_time:.2f}]")
     return distance_matrix, vectors_final
 
 
@@ -790,80 +743,33 @@ def GPU_krum(w_locals, c, args):
     context,pk,sk,glk,rlk,encoder,scale = GPU_init()
 
     distance_matrix, vectors_final = GPU_computing_distance_cipher(context,pk,sk,glk,rlk,encoder, scale, w_locals)
-
-
     mask,chosen_idx = GPU_decrypt_sort_mask(context,pk,sk,encoder,scale,distance_matrix)
-
-    print("chosen_idx", chosen_idx)
-    w_new=GPU_mul_mask_weight(context, pk, encoder, scale, rlk,vectors_final,mask,sk)
-
-
-    #return copy.deepcopy(w_locals[chosen_idx]), chosen_idx
-
-    vectors = multi_vectorization_cipher(w_locals)
-
-    num_clients, weight_len = len(vectors), len(vectors[0])
-    print(num_clients, weight_len, type(vectors[0]))
-
-    # padding
-    ringDim = Nslot*2
-    numSlots = int(ringDim / 2)
-
-    if weight_len % numSlots == 0:
-        whole_len = weight_len
-    else:
-        whole_len = (weight_len // numSlots + 1) * numSlots
-
-    vectors_new = [[] for i in range(num_clients)]
-    for idx in range(num_clients):
-        vectors_new[idx] = (np.pad(vectors[idx], (0, whole_len - weight_len), 'constant'))
-
-    # split
-    vectors_final = [[] for i in range(num_clients)]
-    # raise ValueError("1")
-    for idx in range(num_clients):
-        vectors_final[idx] = np.array_split(vectors_new[idx], (whole_len // numSlots))  # [[ndarray], [], []]
+    w_new= GPU_mul_mask_weight(context, pk, encoder, scale, rlk,vectors_final,mask,sk)
 
     return w_new
 
 def krum(w_locals, c, args):
 
     n = len(w_locals) - c
-    args.ckks = 0 #mingwen miwen
-    if args.ckks:
-        cryptocontext, keypair = set_parameters()
-        distance_matrix, vectors_final = computing_distance_cipher(cryptocontext, keypair, w_locals, args)
-        mask = decrypt_sort_mask(cryptocontext, keypair, distance_matrix)
-        vectors_final_new = mul_mask_weight(cryptocontext, keypair, vectors_final, mask)
-
-        raise ValueError
-
-    else:
-        start=time.time()
-        distance = pairwise_distance(w_locals, args)
-        sorted_idx = distance.sum(dim=0).argsort()[: n]
-        chosen_idx = int(sorted_idx[0])
-        end = time.time()
-        print("mingwen time=",end-start)
-        print("chosen_idx",chosen_idx)
-        print(distance.sum(dim=0)[:n])
-        print(sorted_idx)
-    return copy.deepcopy(w_locals[chosen_idx]), chosen_idx
-
-def distancemean(w_locals, c, args):
+    args.ckks = 0 #plaintext, ciphertext
 
     start=time.time()
     distance = pairwise_distance(w_locals, args)
     sorted_idx = distance.sum(dim=0).argsort()[: n]
-    chosen_idx = int(sorted_idx[len(w_locals/2)])
+    chosen_idx = int(sorted_idx[0])
     end = time.time()
-    print("mingwen time=",end-start)
+    print(f"Chosen idx: {chosen_idx}. Training Time in Plaintext = {end-start:.2f}")
+    print(f"We select {sorted_idx[0]} as our aggerated client.")
+
     return copy.deepcopy(w_locals[chosen_idx]), chosen_idx
 
+def distancemean(w_locals, c, args):
 
-def Multi_krum(w_locals, c, args):
-    # send a distance matrix, and computing distance and sort in key generation center.
-    pass  
+    distance = pairwise_distance(w_locals, args)
+    sorted_idx = distance.sum(dim=0).argsort()[: n]
+    chosen_idx = int(sorted_idx[len(w_locals/2)])
+    return copy.deepcopy(w_locals[chosen_idx]), chosen_idx
+
 
 def trimmed_mean(w_locals, c, args): # RFA
     n = len(w_locals) - 2 * c
