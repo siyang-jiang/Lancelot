@@ -3,11 +3,13 @@
 ## Install cahel-main
 
 ##### Update the Ubuntu
-`sudo apt-get update`
-`sudo apt-get install -y software-properties-common lsb-
-release`
-`sudo apt-get clean all`
-`sudo apt-add-repository 'deb` `https://apt.kitware.com/ubuntu/ focal main'`
+```
+sudo apt-get update
+sudo apt-get install -y software-properties-common lsb-release
+sudo apt-get clean all
+sudo apt-add-repository 'deb` `https://apt.kitware.com/ubuntu/ focal main'
+```
+
 
 ##### Install the Cmake and gcc
 (make sure your cmake version is above 3.25.0 and gcc version is above 9.4.0)
