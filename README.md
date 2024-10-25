@@ -1,4 +1,5 @@
 # Lancelot-Dev
+This repo is the official repo for [Lancelot: Towards Efficient and Privacy-Preserving Byzantine-Robust Federated Learning within Fully Homomorphic Encryption](https://arxiv.org/abs/2408.06197).
 
 To evaluate Lancelot, we first install HomoMul GPU Accelerator (cahel) and then using our example code in lancelot-main-GPU.
 
@@ -51,3 +52,6 @@ conda develop lib
 cd lancelot-main-GPU
 python main.py --cipher_open=1
 ```
+
+## Results
+
