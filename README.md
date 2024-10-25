@@ -1,6 +1,12 @@
 # Lancelot-Dev
 
 To evaluate Lancelot, we first install HomoMul GPU Accelerator (cahel) and then using our example code in lancelot-main-GPU.
+
+> Device: NVIDIA GPU RAM > 24G (such as 4090)
+> cmake version >= 3.25.0
+> gcc version >= 9.4.0
+
+
 ## Install HomoMul GPU Accelerator cahel-main
 
 ##### Update the Ubuntu
@@ -13,7 +19,6 @@ sudo apt-add-repository 'deb` `https://apt.kitware.com/ubuntu/ focal main'
 
 
 ##### Install the Cmake and gcc
-- make sure your cmake version is above 3.25.0 and gcc version is above 9.4.0
 
 ```
 wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc | sudo apt-key add -
