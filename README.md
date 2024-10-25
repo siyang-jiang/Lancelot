@@ -18,11 +18,13 @@ sudo apt-add-repository 'deb` `https://apt.kitware.com/ubuntu/ focal main'
 wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc | sudo apt-key add -
 sudo apt-get update
 sudo dpkg --configure -a
-sudo apt install cmake```
+sudo apt install cmake
+```
 
 
 
 ##### Download the Lancelot
+
 ```
 https://github.com/siyang-jiang/Lancelot-Dev.git
 cd cahel-main
