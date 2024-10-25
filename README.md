@@ -1,6 +1,6 @@
 # Lancelot-Dev
 
-## Install cahel-main
+## Install HomoMul GPU Accelerator cahel-main
 
 ##### Update the Ubuntu
 ```
@@ -38,4 +38,10 @@ cmake --build build -j8
 cd build
 conda activate
 conda develop lib
+```
+
+## Evaluate Lancelot
+```
+cd lancelot-main-GPU
+python main.py --cipher_open=1
 ```
