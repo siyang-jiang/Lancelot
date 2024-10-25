@@ -1,5 +1,6 @@
 # Lancelot-Dev
 
+To evaluate Lancelot, we first install HomoMul GPU Accelerator (cahel) and then using our example code in lancelot-main-GPU.
 ## Install HomoMul GPU Accelerator cahel-main
 
 ##### Update the Ubuntu
