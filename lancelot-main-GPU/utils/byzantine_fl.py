@@ -11,7 +11,7 @@ from torchvision.models import resnet18
 
 from utils.test import test_img
 from src.aggregation import fedavg
-#from openfhe import *
+# from openfhe import *
 import pyCAHEL as cahel
 global DEBUG_MODE, lazy_relin_flag, LAZY_RELIN, Hoisting_flag
 
@@ -179,24 +179,10 @@ def GPU_compute_pair_distance(msg1, msg2,context,pk,sk,glk,rlk,encoder,scale):
             start_inloop = time.time()
 
             cahel.sub(context, ct2, ct1, tmp)   #tmp=ct2-ct1
-
-            #pt_dec = sk.decrypt(context, tmp)
-            #resultsub = encoder.decode(context, pt_dec)
-            #print(sum(resultsub))
-            #print(resultsub)
             cahel.square_inplace(context, tmp)  #tmp^2
-
-            #pt_dec = sk.decrypt(context, tmp)
-            #resultsquare = encoder.decode(context, pt_dec)
-            #print(sum(resultsquare))
-            #print(resultsquare)
             cahel.add_inplace(context, cipher_zero_lazyrelin, tmp)
 
-            #pt_dec = sk.decrypt(context, cipher_zero_lazyrelin)
-            #resultadd = encoder.decode(context, pt_dec)
-
             end_inloop = time.time()
-            #print(f"lazy Time1 is {end_inloop - start_inloop}")
             lazy_time+=end_inloop - start_inloop
 
         else:
@@ -222,6 +208,7 @@ def GPU_compute_pair_distance(msg1, msg2,context,pk,sk,glk,rlk,encoder,scale):
         end_inloop = time.time()
         #print(f"zuihou lazy relin time is {end_inloop - start_inloop}")
 
+
     # Rotaion and ADD:
     if Hoisting_flag:
 
@@ -240,34 +227,38 @@ def GPU_compute_pair_distance(msg1, msg2,context,pk,sk,glk,rlk,encoder,scale):
             cahel.rotate_vector(context, tmp1, rotation_id, glk, tmp_rot)
 
             pt_dec = sk.decrypt(context, tmp_rot)
-            result11 = encoder.decode(context, pt_dec)
+            if DEBUG_MODE:
+                result11 = encoder.decode(context, pt_dec)
 
             cahel.add_inplace(context, tmp1, tmp_rot)
 
             pt_dec = sk.decrypt(context, tmp1)
-            result22 = encoder.decode(context, pt_dec)
+            if DEBUG_MODE:
+                result22 = encoder.decode(context, pt_dec)
 
         end_inloop = time.time()
-        # print(f"hoisting time is {end_inloop - start_inloop}")
+ 
     else:
 
          pt_dec = sk.decrypt(context, tmp1)
-         result111 = encoder.decode(context, pt_dec)
-        #  print(sum(result111))
          tmp_rot = cahel.ciphertext(context)
          start_inloop = time.time()
          for idx in rotation_key: # Check the demension
-             rotation_id = int(2 ** idx)
+            rotation_id = int(2 ** idx)
 
-             cahel.rotate_vector(context, tmp1, rotation_id, glk,tmp_rot)
+            cahel.rotate_vector(context, tmp1, rotation_id, glk,tmp_rot)
 
-             pt_dec = sk.decrypt(context, tmp_rot)
-             result11 = encoder.decode(context, pt_dec)
+            pt_dec = sk.decrypt(context, tmp_rot)
 
-             cahel.add_inplace(context, tmp1, tmp_rot)
+            if DEBUG_MODE:
+                result11 = encoder.decode(context, pt_dec)
 
-             pt_dec = sk.decrypt(context, tmp1)
-             result22 = encoder.decode(context, pt_dec)
+            cahel.add_inplace(context, tmp1, tmp_rot)
+
+            pt_dec = sk.decrypt(context, tmp1)
+
+            if DEBUG_MODE:
+                result22 = encoder.decode(context, pt_dec)
 
          end_inloop = time.time()
 
@@ -284,8 +275,8 @@ def GPU_compute_pair_distance(msg1, msg2,context,pk,sk,glk,rlk,encoder,scale):
 
     cipher_distance = tmp1
     pt_dec = sk.decrypt(context, tmp1)
-    result1 = encoder.decode(context, pt_dec)
-    # print(result1[0])
+    if DEBUG_MODE:
+        result1 = encoder.decode(context, pt_dec)
     return cipher_distance
 
 
@@ -351,7 +342,6 @@ def compute_pair_distance(msg1, msg2, cryptocontext, keyPair):
 
     if Hoisting_flag:
         pass
-        # TODO
     else:
         starttime = time.time()
         for idx in rotation_key:  # Check the demension
@@ -425,12 +415,6 @@ def computing_distance_cipher(cryptocontext, keyPair, w_locals, args):
     print(f"Distance Computing Time is {end - start}")
 
 
-        
-
-    if simple_ball:
-        pass
-        # TODO
-
     return distance_matrix, vectors_final
 
 def decrypt_sort_mask(cryptocontext, keyPair, distance_matrix):
@@ -468,10 +452,7 @@ def decrypt_sort_mask(cryptocontext, keyPair, distance_matrix):
         p_distance.append(p_distance_tmp)
 
     print(p_distance)
-    # print(p_distance)
-    # TODO
-    # SORT p_distance and produce the encrypted mask; One Checkpoint
-    # based on a sorted array, produce a mask;
+
 
 
     sort_list = [i for i in range(num_clients)]
