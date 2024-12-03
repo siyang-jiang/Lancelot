@@ -46,6 +46,12 @@ cd build
 conda activate
 conda develop lib
 ```
+(pleae make sure you have already install conda-build, otherwise)
+```
+conda install conda-build
+```
+
+
 
 ## Evaluate Lancelot
 ```
