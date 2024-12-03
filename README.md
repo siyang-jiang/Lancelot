@@ -45,6 +45,8 @@ cmake --build build -j8
 cd build
 conda activate
 conda develop lib
+pleae make sure you have already install conda-build
+otherwise, using conda install conda-build
 ```
 
 ## Evaluate Lancelot
