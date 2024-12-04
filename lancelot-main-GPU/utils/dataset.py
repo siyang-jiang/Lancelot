@@ -47,8 +47,8 @@ def load_data(args):
 
     trans = transforms.Compose([transforms.ToTensor(),transforms.Normalize(mean=[.5], std=[.5])])
 
-    if args.dataset in ["CIFAR10", "MNIST", "FaMNIST","SVHN"]:
-        data_path = './data/'
+    if args.dataset in ["CIFAR10", "MNIST", "FaMNIST","SVHN","ImageNet"]:
+        data_path = '../dataset/'
         if not os.path.exists(data_path):
             os.makedirs(data_path)
 
@@ -61,10 +61,13 @@ def load_data(args):
         elif args.dataset == "FaMNIST":
             dataset_train = datasets.FashionMNIST(data_path, train=True, download=True,  transform=trans)
             dataset_test = datasets.FashionMNIST(data_path, train=False, download=True, transform=trans)
-
         elif args.dataset == "SVHN":
             dataset_train = datasets.SVHN(data_path, split='train', download=True,  transform=trans)
             dataset_test = datasets.SVHN(data_path, split='test', download=True, transform=trans)
+        elif args.dataset == "ImageNet":
+            data_path_val = "/home/syjiang/Datasets/ImageNet12/"
+            dataset_train = datasets.ImageNet(data_path_val, split= "train", transform=trans)
+            dataset_test = datasets.ImageNet(data_path_val, split= "val", transform=trans)
 
         dataset_val = []
     else:

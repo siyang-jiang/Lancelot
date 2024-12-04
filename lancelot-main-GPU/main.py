@@ -3,7 +3,7 @@ warnings.filterwarnings('ignore')
 
 import torch
 from torch.utils.tensorboard import SummaryWriter
-from torchvision.models import resnet18,resnet34,resnet50
+from torchvision.models import resnet18,resnet34,resnet50, mobilenet_v2
 import time
 import copy
 import numpy as np
@@ -45,12 +45,18 @@ if __name__ == '__main__':
     args = args_parser()
     args.device = torch.device('cuda:{}'.format(args.gpu) if torch.cuda.is_available() and args.gpu != -1 else 'cpu')
 
-    args.dataset = "CIFAR10"
+    # args.dataset = "CIFAR10"
     args.num_classes = 10
     if args.dataset in ["CIFAR10", "MNIST", "FaMNIST","SVHN"]:
     # Change the package  [/home/syjiang/anaconda3/lib/python3.11/site-packages/torchvision/models/resnet.py] Line 197 3 ==> 1 in MNIST and FaMNIST
         args.num_classes = 10
-    print("args.num_classes",args.num_classes)
+        print("args.num_classes",args.num_classes)
+    
+    if args.dataset in ['ImageNet']:
+        args.num_classes = 1000
+        print("args.num_classes",args.num_classes)
+
+
     args.tsboard=True
 
     if args.tsboard:
@@ -78,7 +84,8 @@ if __name__ == '__main__':
         net_glob = resnet34(num_classes = args.num_classes).to(args.device)  #change model
     elif args.dataset in ["SVHN","octmnist","bloodmnist","organsmnist"]:
         net_glob = resnet50(num_classes = args.num_classes).to(args.device)  #change model
-
+    elif args.dataset in ["ImageNet"]:
+        net_glob = mobilenet_v2(num_classes = args.num_classes).to(args.device)  #change model
 
 
     net_glob.train()
@@ -126,7 +133,6 @@ if __name__ == '__main__':
         print("+------------ Train on the plaintext. -----------+") 
         w_glob1, _ = krum(w_locals, compromised_num, args)
         print("+-------- End on training the plaintext. --------+") 
-
         print("+------------------------------------------------+")
         
         if args.cipher_open:
