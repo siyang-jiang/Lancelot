@@ -59,5 +59,5 @@ cd lancelot-main-GPU
 bash run.sh
 ```
 
-## Results
-![Results](https://github.com/siyang-jiang/Lancelot-Dev/blob/main/results.jpeg)
+<!-- ## Results
+![Results](https://github.com/siyang-jiang/Lancelot-Dev/blob/main/results.jpeg) -->
