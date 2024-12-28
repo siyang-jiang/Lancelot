@@ -56,7 +56,7 @@ conda install conda-build
 ## Evaluate Lancelot
 ```
 cd lancelot-main-GPU
-python main.py --cipher_open=1
+bash run.sh
 ```
 
 ## Results
