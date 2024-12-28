@@ -7,7 +7,7 @@
 ##### The results is shown in log_2023.txt and log_ciper_2023.txt
 
 
-| Epoch | PlaintText | CipherText |
+| Epoch | Acc in PlaintText | Acc in CipherText |
 |:-----:|:----------:|:----------:|
 |   0   |   29.10    |   29.10    |
 |   1   |   25.27    |   25.88    |
