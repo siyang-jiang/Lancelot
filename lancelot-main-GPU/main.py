@@ -19,6 +19,17 @@ from utils.attack import compromised_clients, untargeted_attack
 from src.aggregation import fedavg,fedavg_5wei
 from src.update import BenignUpdate, CompromisedUpdate
 
+import os
+def set_seed(seed=42):
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)  
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+    os.environ["PYTHONHASHSEED"] = str(seed)
+
 def reshape_flat_list_to_state_dict(flat_list, state_dict_template):
     new_state_dict = {}
     index = 0
@@ -41,31 +52,27 @@ def flatten_dict(d, parent_key='', sep='.'):
 
 
 if __name__ == '__main__':
+
     # parse args
     args = args_parser()
     args.device = torch.device('cuda:{}'.format(args.gpu) if torch.cuda.is_available() and args.gpu != -1 else 'cpu')
 
-    # args.dataset = "CIFAR10"
-    args.num_classes = 10
+    args.dataset = "CIFAR10"
     if args.dataset in ["CIFAR10", "MNIST", "FaMNIST","SVHN"]:
     # Change the package  [/home/syjiang/anaconda3/lib/python3.11/site-packages/torchvision/models/resnet.py] Line 197 3 ==> 1 in MNIST and FaMNIST
         args.num_classes = 10
         print("args.num_classes",args.num_classes)
-    
-    if args.dataset in ['ImageNet']:
-        args.num_classes = 1000
-        print("args.num_classes",args.num_classes)
-
 
     args.tsboard=True
 
     if args.tsboard:
         writer = SummaryWriter(f'runs/data')
 
-    random.seed(args.seed)
-    np.random.seed(args.seed)
-    torch.manual_seed(args.seed)
-    torch.cuda.manual_seed_all(args.seed)
+    set_seed(args.seed)
+    # random.seed(args.seed)
+    # np.random.seed(args.seed)
+    # torch.manual_seed(args.seed)
+    # torch.cuda.manual_seed_all(args.seed)
 
     dataset_train, dataset_test, dataset_val = load_data(args)
 
@@ -91,7 +98,7 @@ if __name__ == '__main__':
     net_glob.train()
 
     # copy weights
-    print(args.device)
+    # print(args.device)
     w_glob = net_glob.state_dict()
 
     if args.c_frac > 0:
@@ -100,6 +107,12 @@ if __name__ == '__main__':
         compromised_idxs = []
 
     local_traintime=0
+
+    if args.cipher_open:
+        file_name = f'log_ciper_{args.seed}.txt'
+    else:
+        file_name = f'log_{args.seed}.txt'
+
     for iter in trange(args.global_ep):
         w_locals = []
         selected_clients = max(int(args.frac * args.num_clients), 1)
@@ -134,7 +147,6 @@ if __name__ == '__main__':
         w_glob1, _ = krum(w_locals, compromised_num, args)
         print("+-------- End on training the plaintext. --------+") 
         print("+------------------------------------------------+")
-        
         if args.cipher_open:
             print("+-------- Train on the ciphertext. ----------+") 
 
@@ -149,6 +161,7 @@ if __name__ == '__main__':
             error = 0
             tmp = 1
             
+            # Compare the error
             for x , y in zip(model_list_w_glob1, model_list_w_glob2):
                 shape_list = list(x.shape)
                 for item in shape_list:
@@ -164,6 +177,7 @@ if __name__ == '__main__':
             print(f"Check the error the model between the two methods: {error}", flush=True)  
             print("+--------- End on the ciphertext --------------+")
 
+            
         if args.cipher_open:
             net_glob.load_state_dict(w_glob_reshaped)
         else:
@@ -171,6 +185,12 @@ if __name__ == '__main__':
 
         test_acc, test_loss = test_img(net_glob.to(args.device), dataset_test, args)
 
+
+        with open(file_name, "a") as log_file:  # "a" 模式表示追加写入
+            log_message =  f"=================> EP: {iter}, Test acc: {test_acc}"
+            log_file.write(log_message + "\n")  # 每条日志以换行符结尾
+
+        print(f"=================> EP: {iter}, Test acc: {test_acc}")
         if check_acc == 0:
             check_acc = test_acc
         elif test_acc < check_acc + args.delta:
@@ -186,7 +206,6 @@ if __name__ == '__main__':
 
         # tensorboard
         args.tsboard=True
-
         if args.tsboard:
             writer.add_scalar(f'testacc/{args.method}_{args.p}_cfrac_{args.c_frac}_alpha_{args.alpha}', test_acc, iter)
             writer.add_scalar(f'testloss/{args.method}_{args.p}_cfrac_{args.c_frac}_alpha_{args.alpha}', test_loss, iter)

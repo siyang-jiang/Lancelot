@@ -739,7 +739,7 @@ def krum(w_locals, c, args):
     sorted_idx = distance.sum(dim=0).argsort()[: n]
     chosen_idx = int(sorted_idx[0])
     end = time.time()
-    print(f"Chosen idx: {chosen_idx}. Training Time in Plaintext = {end-start:.2f}")
+    # print(f"Chosen idx: {chosen_idx}. Training Time in Plaintext = {end-start:.2f}")
     print(f"We select {sorted_idx[0]} as our aggerated client.")
 
     return copy.deepcopy(w_locals[chosen_idx]), chosen_idx

@@ -17,7 +17,9 @@ class BenignUpdate(object):
         net.train()
         
         # train and update
-        optimizer = torch.optim.SGD(net.parameters(), lr=self.args.lr)
+        # optimizer = torch.optim.SGD(net.parameters(), lr=self.args.lr)
+        optimizer = torch.optim.Adam(net.parameters(), lr=self.args.lr,betas=(0.9, 0.999), eps=1e-08, weight_decay=0)
+
 
         for iter in range(self.args.local_ep):
             for batch_idx, (images, labels) in enumerate(self.ldr_train):
@@ -49,7 +51,8 @@ class CompromisedUpdate(object):
         net.train()
         
         # train and update
-        optimizer = torch.optim.SGD(net.parameters(), lr=self.args.lr)
+        # optimizer = torch.optim.SGD(net.parameters(), lr=self.args.lr)
+        optimizer = torch.optim.Adam(net.parameters(), lr=self.args.lr,betas=(0.9, 0.999), eps=1e-08, weight_decay=0)
     
         for iter in range(self.args.local_ep):
             for batch_idx, (images, labels) in enumerate(self.ldr_train):

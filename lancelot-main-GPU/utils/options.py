@@ -20,7 +20,7 @@ def args_parser():
     parser.add_argument('--lr', type=float, default=0.001, help="client learning rate")
 
     # other arguments
-    parser.add_argument('--dataset', type=str, default='bloodmnist', help="name of dataset")
+    parser.add_argument('--dataset', type=str, default='CIFAR10', help="name of dataset")
     parser.add_argument('--model', type=str, default='resnet', help='model name')
     parser.add_argument('--sampling', type=str, default='noniid', help="sampling method")
     parser.add_argument('--num_classes', type=int, default=8, help="number of classes")
@@ -37,6 +37,7 @@ def args_parser():
     parser.add_argument('--mp_alpha', type=float, default=10.0, help="hyperparameter for targeted model attack")
     parser.add_argument('--p', type=str, default='normal', help="model poisoning attack (target, untarget) or data poisoning")
     parser.add_argument('--mp_lambda', type=float, default=10.0, help="hyperparameter for untargeted model attack")
+    parser.add_argument('--cipher_open', type=int, default=0, help="hyperparameter for opening cipher_training")
 
     args = parser.parse_args()
     
