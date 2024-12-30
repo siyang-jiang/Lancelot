@@ -14,12 +14,14 @@ from utils.options import args_parser
 from utils.sampling import noniid
 from utils.dataset import load_data, LeNet5
 from utils.test import test_img
-from utils.byzantine_fl import GPU_krum,krum, trimmed_mean, fang, dummy_contrastive_aggregation
+from utils.byzantine_fl import GPU_krum, krum, trimmed_mean, fang, dummy_contrastive_aggregation
+from utils.openfhe import  set_parameters
 from utils.attack import compromised_clients, untargeted_attack
 from src.aggregation import fedavg,fedavg_5wei
 from src.update import BenignUpdate, CompromisedUpdate
 
 import os
+
 def set_seed(seed=42):
     random.seed(seed)
     np.random.seed(seed)
@@ -57,22 +59,17 @@ if __name__ == '__main__':
     args = args_parser()
     args.device = torch.device('cuda:{}'.format(args.gpu) if torch.cuda.is_available() and args.gpu != -1 else 'cpu')
 
-    args.dataset = "CIFAR10"
+    # args.dataset = "CIFAR10"
     if args.dataset in ["CIFAR10", "MNIST", "FaMNIST","SVHN"]:
     # Change the package  [/home/syjiang/anaconda3/lib/python3.11/site-packages/torchvision/models/resnet.py] Line 197 3 ==> 1 in MNIST and FaMNIST
         args.num_classes = 10
         print("args.num_classes",args.num_classes)
 
     args.tsboard=True
-
     if args.tsboard:
         writer = SummaryWriter(f'runs/data')
 
     set_seed(args.seed)
-    # random.seed(args.seed)
-    # np.random.seed(args.seed)
-    # torch.manual_seed(args.seed)
-    # torch.cuda.manual_seed_all(args.seed)
 
     dataset_train, dataset_test, dataset_val = load_data(args)
 
@@ -96,9 +93,6 @@ if __name__ == '__main__':
 
 
     net_glob.train()
-
-    # copy weights
-    # print(args.device)
     w_glob = net_glob.state_dict()
 
     if args.c_frac > 0:
@@ -109,9 +103,14 @@ if __name__ == '__main__':
     local_traintime=0
 
     if args.cipher_open:
-        file_name = f'log_ciper_{args.seed}.txt'
+        file_name = f'log_ciper_{args.dataset}_{args.seed}.txt'
     else:
-        file_name = f'log_{args.seed}.txt'
+        file_name = f'log_{args.dataset}_{args.seed}.txt'
+
+    if args.method == 'krum':
+        print("We test the krum method, first in plaintext and then in cipertext.")     
+    else:
+        exit('Error: unrecognized aggregation technique')
 
     for iter in trange(args.global_ep):
         w_locals = []
@@ -137,20 +136,22 @@ if __name__ == '__main__':
 
                 w_locals.append(copy.deepcopy(w))
 
-        if args.method == 'krum':
-            print("We test the krum method, first in plaintext and then in cipertext.")     
-        else:
-            exit('Error: unrecognized aggregation technique')
-        
         print("+------------------------------------------------+")
         print("+------------ Train on the plaintext. -----------+") 
-        w_glob1, _ = krum(w_locals, compromised_num, args)
+        w_glob1, _, round_time = krum(w_locals, compromised_num, args)
+        if args.openfhe:
+            print(f"One Round OpenFHE Time is {round_time:.6} Second.")
+        else:
+            print(f"Local Traning Krum Time is {round_time:.6} Second.")
         print("+-------- End on training the plaintext. --------+") 
         print("+------------------------------------------------+")
         if args.cipher_open:
-            print("+-------- Train on the ciphertext. ----------+") 
+            print("+------ Train on the ciphertext (Lancelot). -------+") 
 
+            start = time.time()
             w_glob_flat = GPU_krum(w_locals, compromised_num, args)
+            end = time.time()
+            print(f"One Round Lancelot Time is {end-start:.6} Second.")
             w_glob_reshaped = reshape_flat_list_to_state_dict(w_glob_flat, w_glob1)
 
             flattened_dict_plain, flatten_dict_cipher = flatten_dict(w_glob1), flatten_dict(w_glob_reshaped)
@@ -186,11 +187,11 @@ if __name__ == '__main__':
         test_acc, test_loss = test_img(net_glob.to(args.device), dataset_test, args)
 
 
-        with open(file_name, "a") as log_file:  # "a" 模式表示追加写入
-            log_message =  f"=================> EP: {iter}, Test acc: {test_acc}"
-            log_file.write(log_message + "\n")  # 每条日志以换行符结尾
+        with open(file_name, "a") as log_file: 
+            log_message =  f"=================> EP: {iter}, Test acc: {test_acc:.4}"
+            log_file.write(log_message + "\n") 
 
-        print(f"=================> EP: {iter}, Test acc: {test_acc}")
+        print(f"=================> EP: {iter}, Test acc: {test_acc:.4}")
         if check_acc == 0:
             check_acc = test_acc
         elif test_acc < check_acc + args.delta:
