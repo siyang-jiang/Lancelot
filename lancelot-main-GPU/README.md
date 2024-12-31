@@ -1,7 +1,7 @@
 ## Examples in Lacelot
 
-##### We provide an example of how to use Lacelot in CIFAR10.  To save time, we use client = 4, the method is Krum
-`bash run.sh`
+##### We provide an example of how to use Lacelot in CIFAR10.
+`bash run_lancelot.sh`
 
 ## Results
 ##### The results is shown in log_2023.txt and log_ciper_2023.txt
@@ -19,5 +19,11 @@
 |   7   |   41.56    |   42.61    |
 |   8   |   42.49    |   40.93    |
 |   9   |   40.79    |   41.15    |
+
+##### We provide an example of how to use OpenFHE in MNIST.
+`bash run_openfhe.sh`
+
+##### please install OpenFHE following the this [link](https://github.com/openfheorg/openfhe-python)
+
 
 <!-- ![Results](https://github.com/siyang-jiang/Lancelot-Dev/blob/main/lancelot-main-GPU/result.png) -->
