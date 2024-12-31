@@ -23,7 +23,7 @@
 ##### We provide an example of how to use OpenFHE in MNIST.
 `bash run_openfhe.sh`
 
-##### please install OpenFHE following the this [link](https://github.com/openfheorg/openfhe-python)
+##### please install OpenFHE following the this [link](https://github.com/openfheorg/openfhe-python).
 
 
 <!-- ![Results](https://github.com/siyang-jiang/Lancelot-Dev/blob/main/lancelot-main-GPU/result.png) -->
