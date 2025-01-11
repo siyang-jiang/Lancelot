@@ -56,7 +56,7 @@ conda install conda-build
 ## Evaluate Lancelot
 ```
 cd lancelot-main-GPU
-bash run.sh
+bash run_lancelot.sh
 ```
 
 <!-- ## Results
