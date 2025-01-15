@@ -42,7 +42,7 @@ conda develop cahel-main/build/lib
 
 
 
-# run lancelot
+# run Lancelot
 python -u  lancelot-main-GPU/main.py --gpu 0 --method krum --tsboard  --quantity_skew --global_ep 5 --cipher_open 1 --checks true --seed 2025 --dataset MNIST "$@"
 
 python -u  lancelot-main-GPU/main.py --gpu 0 --method krum --tsboard  --quantity_skew --global_ep 5 --cipher_open 0 --seed 2025 --dataset MNIST "$@"
