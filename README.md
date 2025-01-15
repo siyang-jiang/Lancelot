@@ -8,7 +8,7 @@ To evaluate Lancelot, we first install HomoMul GPU Accelerator (cahel) and then 
 > gcc version >= 9.4.0
 
 ## Update 
-- Hope to provide code ocean link soon.  
+- 🔥 Will provide code ocean link soon.  
 - 🔥🔥 We have already passed the code testing in the code ocean. 
 - 🔥🔥 We provide a new end-to-end script for excuting Lancelot. Please find run.sh.
 
