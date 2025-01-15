@@ -39,6 +39,8 @@ def args_parser():
     parser.add_argument('--mp_lambda', type=float, default=10.0, help="hyperparameter for untargeted model attack")
     parser.add_argument('--cipher_open', type=int, default=0, help="hyperparameter for opening cipher_training")
     parser.add_argument('--openfhe', type=bool, default=False, help="Use openFHE or not.")
+    parser.add_argument('--checks', type=bool, default=False, help="Use openFHE or not.")
+
 
 
     args = parser.parse_args()

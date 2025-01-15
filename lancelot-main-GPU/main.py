@@ -112,6 +112,8 @@ if __name__ == '__main__':
     else:
         exit('Error: unrecognized aggregation technique')
 
+    cryptocontext, keypair = set_parameters()
+
     for iter in trange(args.global_ep):
         w_locals = []
         selected_clients = max(int(args.frac * args.num_clients), 1)
@@ -136,22 +138,22 @@ if __name__ == '__main__':
 
                 w_locals.append(copy.deepcopy(w))
 
-        print("+------------------------------------------------+")
-        print("+------------ Train on the plaintext. -----------+") 
-        w_glob1, _, round_time = krum(w_locals, compromised_num, args)
+        #print("\n+------------------------------------------------+")
+        #print("+------------ Train on the plaintext. -----------+") 
+        w_glob1, _, round_time = krum(w_locals, compromised_num, args, cryptocontext, keypair)
         if args.openfhe:
-            print(f"One Round OpenFHE Time is {round_time:.6} Second.")
+            print(f"\n ==> One Round OpenFHE Time is {round_time:.6} Second.")
         else:
-            print(f"Local Traning Krum Time is {round_time:.6} Second.")
-        print("+-------- End on training the plaintext. --------+") 
-        print("+------------------------------------------------+")
+            print(f"\n ==> Local Traning Krum Time is {round_time:.6} Second.")
+        #print("+-------- End on training the plaintext. --------+") 
+        #print("+------------------------------------------------+")
         if args.cipher_open:
-            print("+------ Train on the ciphertext (Lancelot). -------+") 
+            print("\n +------ Train on the ciphertext (Lancelot). -------+") 
 
             start = time.time()
             w_glob_flat = GPU_krum(w_locals, compromised_num, args)
             end = time.time()
-            print(f"One Round Lancelot Time is {end-start:.6} Second.")
+            print(f"==> One Round Lancelot Time is {end-start:.6} Second.")
             w_glob_reshaped = reshape_flat_list_to_state_dict(w_glob_flat, w_glob1)
 
             flattened_dict_plain, flatten_dict_cipher = flatten_dict(w_glob1), flatten_dict(w_glob_reshaped)
@@ -175,8 +177,9 @@ if __name__ == '__main__':
 
             # Devide by the number of elements in the model
             error = error / len(model_list_w_glob1)
-            print(f"Check the error the model between the two methods: {error}", flush=True)  
-            print("+--------- End on the ciphertext --------------+")
+            if args.checks:
+                print(f"Check the error the model between the two methods: {error}", flush=True)  
+            #print("+--------- End on the ciphertext --------------+")
 
             
         if args.cipher_open:
@@ -188,10 +191,10 @@ if __name__ == '__main__':
 
 
         with open(file_name, "a") as log_file: 
-            log_message =  f"=================> EP: {iter}, Test acc: {test_acc:.4}"
+            log_message =  f"==> EP: {iter}, Test acc: {test_acc:.4}"
             log_file.write(log_message + "\n") 
 
-        print(f"=================> EP: {iter}, Test acc: {test_acc:.4}")
+        print(f"==> EP: {iter}, Test acc: {test_acc:.4}")
         if check_acc == 0:
             check_acc = test_acc
         elif test_acc < check_acc + args.delta:
@@ -206,7 +209,6 @@ if __name__ == '__main__':
             break
 
         # tensorboard
-        args.tsboard=True
         if args.tsboard:
             writer.add_scalar(f'testacc/{args.method}_{args.p}_cfrac_{args.c_frac}_alpha_{args.alpha}', test_acc, iter)
             writer.add_scalar(f'testloss/{args.method}_{args.p}_cfrac_{args.c_frac}_alpha_{args.alpha}', test_loss, iter)

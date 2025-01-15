@@ -7,6 +7,10 @@ To evaluate Lancelot, we first install HomoMul GPU Accelerator (cahel) and then 
 > cmake version >= 3.25.0
 > gcc version >= 9.4.0
 
+## Update 
+We provide a new script for excuting Lancelot. 
+Please find run.sh
+> bash run.sh 
 
 ## Install HomoMul GPU Accelerator cahel-main
 

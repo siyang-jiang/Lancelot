@@ -523,7 +523,7 @@ def GPU_krum(w_locals, c, args):
 
     return w_new
 
-def krum(w_locals, c, args):
+def krum(w_locals, c, args, cryptocontext, keypair):
 
     n = len(w_locals) - c
     start=time.time()
@@ -537,7 +537,7 @@ def krum(w_locals, c, args):
     if args.openfhe:
         print("+------ Train on the ciphertext (OpenFHE). ------+") 
         start = time.time()
-        cryptocontext, keypair = set_parameters()
+
         distance_matrix, vectors_final = computing_distance_cipher(cryptocontext, keypair, w_locals, args)
         mask = decrypt_sort_mask(cryptocontext, keypair, distance_matrix)
         vectors_final_new = mul_mask_weight(cryptocontext, keypair, vectors_final, mask)
