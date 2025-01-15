@@ -9,8 +9,14 @@ To evaluate Lancelot, we first install HomoMul GPU Accelerator (cahel) and then 
 
 ## Update 
 We provide a new script for excuting Lancelot. 
-Please find run.sh
-> bash run.sh 
+
+Please find run.sh.
+
+ Note that specify your GPU architecture (e.g. 75 is for T4, 89 is for 4090) in CMAKE (Line 32 in run.sh) 
+```
+ bash run.sh 
+```
+
 
 ## Install HomoMul GPU Accelerator cahel-main
 
