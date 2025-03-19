@@ -20,30 +20,24 @@ DEBUG_MODE = 0
 def set_parameters():
      
     parameters = CCParamsCKKSRNS()
-    secretKeyDist = SecretKeyDist.UNIFORM_TERNARY
-    parameters.SetSecretKeyDist(secretKeyDist)
-
+    parameters.SetSecretKeyDist(SecretKeyDist.UNIFORM_TERNARY)
     parameters.SetSecurityLevel(SecurityLevel.HEStd_NotSet)
     parameters.SetRingDim(1<<15)
+    parameters.SetScalingModSize(59)
+    parameters.SetScalingTechnique(ScalingTechnique.FLEXIBLEAUTO)
+    parameters.SetFirstModSize(60)
+    parameters.SetMultiplicativeDepth(2)
 
-    rescaleTech = ScalingTechnique.FLEXIBLEAUTO
+    # phase 1: estimate noise
+    # parameters.SetExecutionMode(ExecutionMode.EXEC_NOISE_ESTIMATION)
+    # parameters.SetDecryptionNoiseMode(DecryptionNoiseMode.NOISE_FLOODING_DECRYPT)
 
-    dcrtBits = 59
-    firstMod = 60
-    
-    parameters.SetScalingModSize(dcrtBits)
-    parameters.SetScalingTechnique(rescaleTech)
-    parameters.SetFirstModSize(firstMod)
+    # phase 2: evaluation
+    parameters.SetExecutionMode(ExecutionMode.EXEC_EVALUATION)
+    parameters.SetNoiseEstimate(5.574611952644673)
+    parameters.SetDecryptionNoiseMode(DecryptionNoiseMode.NOISE_FLOODING_DECRYPT)
 
-    levelBudget = [4, 4]
-    approxBootstrappDepth = 8
-
-    levelsUsedBeforeBootstrap = 10
-
-    depth = levelsUsedBeforeBootstrap + FHECKKSRNS.GetBootstrapDepth(approxBootstrappDepth, levelBudget, secretKeyDist)
-
-    parameters.SetMultiplicativeDepth(depth)
-
+    # Generate context
     cryptocontext = GenCryptoContext(parameters)
     cryptocontext.Enable(PKESchemeFeature.PKE)
     cryptocontext.Enable(PKESchemeFeature.KEYSWITCH)
@@ -56,11 +50,8 @@ def set_parameters():
     numSlots = int(ringDim / 2)
     # print(f"OpenFHE CKKS is using ring dimension {ringDim}")
 
-    cryptocontext.EvalBootstrapSetup(levelBudget)
-
     keyPair = cryptocontext.KeyGen()
     cryptocontext.EvalMultKeyGen(keyPair.secretKey)
-    cryptocontext.EvalBootstrapKeyGen(keyPair.secretKey, numSlots)
 
     return cryptocontext, keyPair
 
@@ -281,4 +272,7 @@ def mul_mask_weight(cryptocontext, keyPair, vectors_final, mask):
     end = time.time()
     # print(f"Mask Multiplication Time is {end - start:.8}")
     result = cryptocontext.Decrypt(tmp_mul, keyPair.secretKey)
+
+    # estimate noise for noise flooding
+    # print('Estimated Noise:', result.GetLogError())
     return result

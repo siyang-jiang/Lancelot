@@ -102,7 +102,7 @@ __global__ void decompose_uint(uint64_t *dst,
         size_t twr = tid / poly_degree;
         DModulus mod = modulus[twr];
 
-        uint128_t temp = {coeffu[coeff_mod_size - 1], 0};
+        _uint128_t temp = {coeffu[coeff_mod_size - 1], 0};
         for (uint32_t i = coeff_mod_size - 1; i--;) {
             temp.lo = coeffu[i];
             temp.hi = barrett_reduce_uint128_uint64(temp, mod.value(), mod.const_ratio());
@@ -241,7 +241,7 @@ __global__ void decompose_array_uint_slow_second_part(uint64_t *dst,
         size_t coeff_id = (tid % sparse_poly_degree) * (coeff_mod_size + 1);
         DModulus mod = modulus[twr];
 
-        uint128_t temp = {src[coeff_id + coeff_mod_size - 1], 0};
+        _uint128_t temp = {src[coeff_id + coeff_mod_size - 1], 0};
         for (uint32_t i = coeff_mod_size - 1; i--;) {
             temp.lo = src[coeff_id + i];
             temp.hi = barrett_reduce_uint128_uint64(temp, mod.value(), mod.const_ratio());
@@ -515,7 +515,7 @@ __forceinline__ __device__ uint64_t decompose_uint(const uint64_t *value,
         return barrett_reduce_uint128_uint64({value[1], value[0]}, modulus.value(), modulus.const_ratio());
     }
 
-    uint128_t temp;
+    _uint128_t temp;
     temp.lo = 0;
     temp.hi = value[coeff_mod_size - 1];
     for (size_t i = coeff_mod_size - 1; i--;) {

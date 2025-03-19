@@ -237,7 +237,7 @@ __global__ void multiply_and_add_rns_poly(const uint64_t *operand1,
         size_t twr = tid / poly_degree;
         DModulus mod = modulus[twr];
 
-        uint128_t prod, sum;
+        _uint128_t prod, sum;
 
         prod = multiply_uint64_uint64(operand1[tid], operand2[tid]);
         sum = add_uint128_uint64(prod, operand3[tid]);
@@ -258,7 +258,7 @@ __global__ void multiply_scalar_and_add_rns_poly(const uint64_t *operand1,
         int twr = tid / poly_degree;
         DModulus mod = modulus[twr];
 
-        uint128_t prod, sum;
+        _uint128_t prod, sum;
 
         prod = multiply_uint64_uint64(operand2[tid], scalar);
         sum = add_uint128_uint64(prod, operand1[tid]);
@@ -308,7 +308,7 @@ __global__ void multiply_and_scale_add_rns_poly(const uint64_t *operand1,
         int twr = tid / poly_degree;
         DModulus mod = modulus[twr];
 
-        uint128_t prod, sum;
+        _uint128_t prod, sum;
 
         prod = multiply_uint64_uint64(operand1[tid], operand2[tid]);
         sum = multiply_uint64_uint64(operand3[tid], scale);
@@ -359,7 +359,7 @@ __global__ void multiply_and_add_negate_rns_poly(const uint64_t *operand1,
         size_t twr = tid / poly_degree;
         DModulus mod = modulus[twr];
 
-        uint128_t product, sum;
+        _uint128_t product, sum;
         uint64_t red;
         product = multiply_uint64_uint64(operand1[tid], operand2[tid]);
         sum = add_uint128_uint64(product, operand3[tid]);
@@ -472,8 +472,8 @@ __global__ void multiply_add_plain_with_scaling_variant_kernel(uint64_t *cipher_
         uint64_t qi_div_t = coeff_div_plain_modulus[twr].operand();
 
         // plain * (q mod t) -> 128bit
-        uint128_t temp;
-        uint128_t quotient;
+        _uint128_t temp;
+        _uint128_t quotient;
         uint64_t pt = plain_data[tid % poly_degree];
         // plain * q_mod_t
         temp = multiply_uint64_uint64(pt, coeff_modulus_mod_plain_modulus); // q_mod_t
@@ -510,8 +510,8 @@ __global__ void multiply_sub_plain_with_scaling_variant_kernel(uint64_t *cipher_
         uint64_t qi_div_t = coeff_div_plain_modulus[twr].operand();
 
         // plain * (q mod t) -> 128bit
-        uint128_t temp;
-        uint128_t quotient;
+        _uint128_t temp;
+        _uint128_t quotient;
         uint64_t pt = plain_data[tid % poly_degree];
         // plain * q_mod_t
         temp = multiply_uint64_uint64(pt, coeff_modulus_mod_plain_modulus); // q_mod_t
@@ -586,7 +586,7 @@ __global__ void tensor_square_2x2_rns_poly(const uint64_t *operand,
         // d0 <- c0 * c'0
         d0 = multiply_and_barrett_reduce_uint64(c0, c0, mod.value(), mod.const_ratio());
         // d1 <- c0 * c'1 + c1 * c'0
-        uint128_t prod;
+        _uint128_t prod;
         prod = multiply_uint64_uint64(c0, c1);
         shift_left_uint128(prod, 1, prod);
         d1 = barrett_reduce_uint128_uint64(prod, mod.value(), mod.const_ratio());
@@ -629,7 +629,7 @@ __global__ void tensor_prod_mxn_rns_poly(const uint64_t *operand1, uint32_t op1_
         auto *c1 = new uint64_t[op1_size];
         auto *c2 = new uint64_t[op2_size];
 
-        uint128_t temp_acc, temp_prod;
+        _uint128_t temp_acc, temp_prod;
 
         for (uint32_t i = 0; i < op1_size; i++) {
             c1[i] = operand1[tid + rns_coeff_count * i];

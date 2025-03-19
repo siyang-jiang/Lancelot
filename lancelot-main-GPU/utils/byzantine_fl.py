@@ -252,8 +252,8 @@ def GPU_compute_pair_distance(msg1, msg2,context,pk,sk,glk,rlk,encoder,scale):
     # Rotaion and ADD:
     if Hoisting_flag:
 
-        pt_dec = sk.decrypt(context, tmp1)
-        result111 = encoder.decode(context, pt_dec)
+        # pt_dec = sk.decrypt(context, tmp1)
+        # result111 = encoder.decode(context, pt_dec)
         # print(sum(result111))
         start_inloop = time.time()
         tmp_rot = cahel.ciphertext(context)
@@ -266,21 +266,21 @@ def GPU_compute_pair_distance(msg1, msg2,context,pk,sk,glk,rlk,encoder,scale):
 
             cahel.rotate_vector(context, tmp1, rotation_id, glk, tmp_rot)
 
-            pt_dec = sk.decrypt(context, tmp_rot)
-            if DEBUG_MODE:
-                result11 = encoder.decode(context, pt_dec)
+            # pt_dec = sk.decrypt(context, tmp_rot)
+            # if DEBUG_MODE:
+            #     result11 = encoder.decode(context, pt_dec)
 
             cahel.add_inplace(context, tmp1, tmp_rot)
 
-            pt_dec = sk.decrypt(context, tmp1)
-            if DEBUG_MODE:
-                result22 = encoder.decode(context, pt_dec)
+            # pt_dec = sk.decrypt(context, tmp1)
+            # if DEBUG_MODE:
+            #     result22 = encoder.decode(context, pt_dec)
 
         end_inloop = time.time()
  
     else:
 
-         pt_dec = sk.decrypt(context, tmp1)
+        #  pt_dec = sk.decrypt(context, tmp1)
          tmp_rot = cahel.ciphertext(context)
          start_inloop = time.time()
          for idx in rotation_key: # Check the demension
@@ -288,17 +288,17 @@ def GPU_compute_pair_distance(msg1, msg2,context,pk,sk,glk,rlk,encoder,scale):
 
             cahel.rotate_vector(context, tmp1, rotation_id, glk,tmp_rot)
 
-            pt_dec = sk.decrypt(context, tmp_rot)
+            # pt_dec = sk.decrypt(context, tmp_rot)
 
-            if DEBUG_MODE:
-                result11 = encoder.decode(context, pt_dec)
+            # if DEBUG_MODE:
+            #     result11 = encoder.decode(context, pt_dec)
 
             cahel.add_inplace(context, tmp1, tmp_rot)
 
-            pt_dec = sk.decrypt(context, tmp1)
+            # pt_dec = sk.decrypt(context, tmp1)
 
-            if DEBUG_MODE:
-                result22 = encoder.decode(context, pt_dec)
+            # if DEBUG_MODE:
+            #     result22 = encoder.decode(context, pt_dec)
 
          end_inloop = time.time()
 
@@ -314,9 +314,10 @@ def GPU_compute_pair_distance(msg1, msg2,context,pk,sk,glk,rlk,encoder,scale):
 
 
     cipher_distance = tmp1
-    pt_dec = sk.decrypt(context, tmp1)
-    if DEBUG_MODE:
-        result1 = encoder.decode(context, pt_dec)
+    # pt_dec = sk.decrypt(context, tmp1)
+    # if DEBUG_MODE:
+    #     result1 = encoder.decode(context, pt_dec)
+
     return cipher_distance
 
 

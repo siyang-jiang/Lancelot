@@ -2,6 +2,9 @@
 #include "mempool.cuh"
 #include "rns.cuh"
 
+#include "openfhe.h"
+using namespace lbcrypto;
+
 using namespace std;
 using namespace cahel;
 using namespace cahel::util;
@@ -625,6 +628,25 @@ void CAHELGPUSecretKey::ckks_decrypt(const CAHELGPUContext &context, const CAHEL
         multiply_and_add_rns_poly<<<gridDimGlb, blockDimGlb>>>(ci, si, destination.data(), base_rns, destination.data(),
                                                                poly_degree, coeff_mod_size);
     }
+
+    // noise flooding
+    const auto dgg = DCRTPoly::DggType(5.574611952644673);
+    std::vector<NativeInteger> moduli;
+    for (size_t i = 0; i < coeff_mod_size; i++) {
+        moduli.emplace_back(coeff_modulus[i].value());
+    }
+    const auto params = std::make_shared<DCRTPoly::Params>(2 * poly_degree, moduli);
+    const DCRTPoly noise(dgg, params, Format::EVALUATION);
+
+    Pointer<uint64_t> d_noise;
+    d_noise.acquire(allocate<uint64_t>(Global(), coeff_mod_size * poly_degree));
+    for (size_t i = 0; i < coeff_mod_size; i++) {
+        CUDA_CHECK(cudaMemcpy(d_noise.get() + i * poly_degree, &noise.GetAllElements()[i].GetValues().at(0),
+                              poly_degree * sizeof(uint64_t), cudaMemcpyHostToDevice));
+    }
+
+    gridDimGlb = (coeff_mod_size * poly_degree) / blockDimGlb.x;
+    add_rns_poly<<<gridDimGlb, blockDimGlb>>>(destination.data(), d_noise.get(), base_rns, destination.data(), poly_degree, coeff_mod_size);
 
     // Set destination parameters as in ciphertext
     destination.chain_index() = encrypted.chain_index();

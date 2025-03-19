@@ -655,7 +655,7 @@ __global__ void sm_mrq_kernel(uint64_t *dst, const uint64_t *src,
             r_m_tilde += Bski.value() - m_tilde;
         }
         // c'_Bsk = (c''_Bsk + q * (r_m_tilde mod Bsk)) * m_tilde^(-1) mod Bsk
-        uint128_t temp;
+        _uint128_t temp;
         temp = multiply_uint64_uint64(r_m_tilde, prod_q_mod_Bski);
         temp = add_uint128_uint64(temp, src[tid]);
         temp.lo = barrett_reduce_uint128_uint64(temp, Bski.value(), Bski.const_ratio());
@@ -1105,19 +1105,19 @@ __global__ void scaleAndRound_HPS_QR_R_kernel(uint64_t *dst, const uint64_t *src
         auto alpha = static_cast<uint64_t>(nu);
 
         for (size_t j = 0; j < size_Rl; j++) {
-            uint128_t curValue = {0, 0};
+            _uint128_t curValue = {0, 0};
             auto rj = base_Rl[j].value();
             auto rj_ratio = base_Rl[j].const_ratio();
             auto t_R_SHatInv_mod_s_div_s_mod_rj = t_R_SHatInv_mod_s_div_s_mod_r + j * (size_Ql + 1);
 
             for (size_t i = 0; i < size_Ql; i++) {
                 uint64_t xi = src_Ql[i * n + tid];
-                uint128_t temp = multiply_uint64_uint64(xi, t_R_SHatInv_mod_s_div_s_mod_rj[i].operand());
+                _uint128_t temp = multiply_uint64_uint64(xi, t_R_SHatInv_mod_s_div_s_mod_rj[i].operand());
                 add_uint128_uint128(temp, curValue, curValue);
             }
 
             uint64_t xi = src_Rl[j * n + tid];
-            uint128_t temp = multiply_uint64_uint64(xi, t_R_SHatInv_mod_s_div_s_mod_rj[size_Ql].operand());
+            _uint128_t temp = multiply_uint64_uint64(xi, t_R_SHatInv_mod_s_div_s_mod_rj[size_Ql].operand());
             add_uint128_uint128(temp, curValue, curValue);
 
             uint64_t curNativeValue = barrett_reduce_uint128_uint64(curValue, rj, rj_ratio);
@@ -1190,18 +1190,18 @@ __global__ void scaleAndRound_HPS_QlRl_Ql_kernel(uint64_t *dst, const uint64_t *
         auto alpha = static_cast<uint64_t>(nu);
 
         for (size_t i = 0; i < size_Ql; i++) {
-            uint128_t curValue = {0, 0};
+            _uint128_t curValue = {0, 0};
 
             auto tQlSlHatInvModsDivsModqi = tQlSlHatInvModsDivsModq + i * (size_Rl + 1);
 
             for (size_t j = 0; j < size_Rl; j++) {
                 uint64_t xj = src_Rl[j * n + tid];
-                uint128_t temp = multiply_uint64_uint64(xj, tQlSlHatInvModsDivsModqi[j].operand());
+                _uint128_t temp = multiply_uint64_uint64(xj, tQlSlHatInvModsDivsModqi[j].operand());
                 add_uint128_uint128(temp, curValue, curValue);
             }
 
             uint64_t xi = src_Ql[i * n + tid];
-            uint128_t temp = multiply_uint64_uint64(xi, tQlSlHatInvModsDivsModqi[size_Rl].operand());
+            _uint128_t temp = multiply_uint64_uint64(xi, tQlSlHatInvModsDivsModqi[size_Rl].operand());
             add_uint128_uint128(temp, curValue, curValue);
 
             auto qi = base_Ql[i].value();

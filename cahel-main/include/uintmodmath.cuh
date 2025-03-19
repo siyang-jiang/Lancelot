@@ -80,13 +80,13 @@ __forceinline__ __device__ void add_uint_uint_mod(const uint64_t *operand1,
  * @param[in] operand2 The operand 2.
  * Return operand1 * operand2 >> 2^192
  */
-__forceinline__ __device__ uint64_t barrett_multiply_and_shift_uint128(const uint128_t &operand1,
-                                                                       const uint128_t &operand2)
+__forceinline__ __device__ uint64_t barrett_multiply_and_shift_uint128(const _uint128_t &operand1,
+                                                                       const _uint128_t &operand2)
 {
     uint64_t p0 = __umul64hi(operand1.lo, operand2.lo);
     // !!!notice: volatile is necessary to avoid the incorrect compiler optimization!!!
-    volatile uint128_t p1 = multiply_uint64_uint64(operand1.lo, operand2.hi);
-    volatile uint128_t p2 = multiply_uint64_uint64(operand1.hi, operand2.lo);
+    volatile _uint128_t p1 = multiply_uint64_uint64(operand1.lo, operand2.hi);
+    volatile _uint128_t p2 = multiply_uint64_uint64(operand1.hi, operand2.lo);
     uint64_t p3 = operand1.hi * operand2.hi;
     asm volatile("add.cc.u64 %0, %0, %1;"
                  : "+l"(p1.lo)
@@ -109,7 +109,7 @@ __forceinline__ __device__ uint64_t barrett_multiply_and_shift_uint128(const uin
  * @param[in] barrett_mu The pre-computed value for mod, (2^128/modulus) in 128 bits.
  * Return prod % mod
  */
-__forceinline__ __device__ uint64_t barrett_reduce_uint128_uint64(const uint128_t &product,
+__forceinline__ __device__ uint64_t barrett_reduce_uint128_uint64(const _uint128_t &product,
                                                                   const uint64_t &modulus,
                                                                   const uint64_t *barrett_mu)
 {

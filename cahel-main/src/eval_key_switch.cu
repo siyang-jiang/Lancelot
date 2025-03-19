@@ -30,8 +30,8 @@ __global__ void key_switch_inner_prod_c2_and_evk(
         uint64_t evk_id = (tid % n) + twr * n;
         uint64_t c2_id = (tid % n) + nid * n;
 
-        uint128_t prod0, prod1;
-        uint128_t acc0, acc1;
+        _uint128_t prod0, prod1;
+        _uint128_t acc0, acc1;
         uint64_t res0, res1;
 
         // ct^x = ( <RNS-Decomp(c*_2), evk_b> , <RNS-Decomp(c*_2), evk_a>

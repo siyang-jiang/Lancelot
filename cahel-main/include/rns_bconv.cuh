@@ -3,15 +3,15 @@
 #include "rns.cuh"
 
 struct uint128_t2 {
-    uint128_t x;
-    uint128_t y;
+    _uint128_t x;
+    _uint128_t y;
 };
 
 struct uint128_t4 {
-    uint128_t x;
-    uint128_t y;
-    uint128_t z;
-    uint128_t w;
+    _uint128_t x;
+    _uint128_t y;
+    _uint128_t z;
+    _uint128_t w;
 };
 
 struct double_t2 {
@@ -171,15 +171,15 @@ __global__ void bconv_matmul_unroll4_kernel(uint64_t *dst,
                                             const DModulus *obase, uint64_t obase_size,
                                             uint64_t n);
 
-__forceinline__ __device__ uint128_t base_convert_acc(const uint64_t *ptr,
+__forceinline__ __device__ _uint128_t base_convert_acc(const uint64_t *ptr,
                                                       const uint64_t *QHatModp, size_t out_prime_idx,
                                                       size_t degree,
                                                       size_t ibase_size,
                                                       size_t degree_idx) {
-    uint128_t accum{0};
+    _uint128_t accum{0};
     for (int i = 0; i < ibase_size; i++) {
         const uint64_t op2 = QHatModp[out_prime_idx * ibase_size + i];
-        uint128_t out;
+        _uint128_t out;
 
         uint64_t op1 = ptr[i * degree + degree_idx];
         out = multiply_uint64_uint64(op1, op2);

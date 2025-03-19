@@ -418,7 +418,7 @@ inplace_fnwt_radix8_phase2_mod_down_fuse(uint64_t *out,
         for (size_t j = 0; j < 8; j++) {
             uint64_t offset = twr_idx * n + n_init + t / 4 * j;
             uint64_t inv_q_last_mod_q_op = inv_q_last_mod_q[twr_idx].operand();
-            uint128_t tmp;
+            _uint128_t tmp;
             add_uint64_uint64(cx[offset], mod_value, tmp.lo);
             sub_uint64_uint64(tmp.lo, samples[j], tmp.lo);
             tmp = multiply_uint64_uint64(tmp.lo, inv_q_last_mod_q_op);

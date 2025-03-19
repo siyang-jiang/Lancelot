@@ -6,12 +6,12 @@
 #include <cuComplex.h>
 #include "common.h"
 
-typedef struct uint128_t {
+typedef struct _uint128_t {
     uint64_t hi;
     uint64_t lo;
     // TODO: implement uint128_t basic operations
 //    __device__ uint128_t &operator+=(const uint128_t &op);
-} uint128_t;
+} _uint128_t;
 
 __forceinline__ __device__ void ld_two_uint64(uint64_t &x, uint64_t &y, const uint64_t *ptr) {
     asm("ld.global.v2.u64 {%0,%1}, [%2];" : "=l"(x), "=l"(y) : "l"(ptr));
@@ -76,9 +76,9 @@ __forceinline__ __device__ bool is_greater_than_or_equal_uint(const uint64_t *op
  * @param[in] shift_amount the bits to be shifted.
  * @param[out] result = operand << shift_amount.
  */
-__forceinline__ __device__ void shift_left_uint128(const uint128_t &operand,
+__forceinline__ __device__ void shift_left_uint128(const _uint128_t &operand,
                                                    const uint32_t &shift_amount,
-                                                   uint128_t &result) {
+                                                   _uint128_t &result) {
     // Early return
     if (shift_amount >= cahel::util::bits_per_uint64_dev)
         result = {operand.lo, 0};
@@ -101,9 +101,9 @@ __forceinline__ __device__ void shift_left_uint128(const uint128_t &operand,
  * @param[in] shift_amount the bits to be shifted.
  * @param[out] result = operand >> shift_amount.
  */
-__forceinline__ __device__ void shift_right_uint128(const uint128_t &operand,
+__forceinline__ __device__ void shift_right_uint128(const _uint128_t &operand,
                                                     const uint32_t &shift_amount,
-                                                    uint128_t &result) {
+                                                    _uint128_t &result) {
 
     // Early return
     if (shift_amount >= cahel::util::bits_per_uint64_dev)
@@ -149,8 +149,8 @@ __forceinline__ __device__ cuDoubleComplex scalar_multiply_cuDoubleComplex(const
  * @param[in] operand2 The operand 2
  * return operand1 + operand2
  */
-__forceinline__ __device__ uint128_t add_uint128_uint64(const uint128_t &operand1, const uint64_t &operand2) {
-    uint128_t result_;
+__forceinline__ __device__ _uint128_t add_uint128_uint64(const _uint128_t &operand1, const uint64_t &operand2) {
+    _uint128_t result_;
     asm volatile("{\n\t"
                  "add.cc.u64   %0, %2, %4;\n\t"
                  "addc.u64  %1, %3,  0;\n\t"
@@ -225,9 +225,9 @@ __forceinline__ __device__ uint8_t addc_uint64_uint64(const uint64_t &operand1,
  * @param[out] result The result
  * return carry bit
  */
-__forceinline__ __device__ void add_uint128_uint128(const uint128_t &operand1,
-                                                    const uint128_t &operand2,
-                                                    uint128_t &result) {
+__forceinline__ __device__ void add_uint128_uint128(const _uint128_t &operand1,
+                                                    const _uint128_t &operand2,
+                                                    _uint128_t &result) {
     asm volatile("{\n\t"
                  "add.cc.u64     %0, %2, %4;\n\t"
                  "addc.u64    %1, %3, %5;\n\t"
@@ -242,9 +242,9 @@ __forceinline__ __device__ void add_uint128_uint128(const uint128_t &operand1,
  * @param[out] result The result
  * return carry bit
  */
-__forceinline__ __device__ uint8_t sub_uint128_uint128(const uint128_t &operand1,
-                                                       const uint128_t &operand2,
-                                                       uint128_t &result) {
+__forceinline__ __device__ uint8_t sub_uint128_uint128(const _uint128_t &operand1,
+                                                       const _uint128_t &operand2,
+                                                       _uint128_t &result) {
     uint32_t borrow_;
     asm volatile("{\n\t"
                  "sub.cc.u64     %0, %3, %5;\n\t"
@@ -346,9 +346,9 @@ __forceinline__ __device__ uint8_t sub_uint_uint(const uint64_t *operand1,
  * @param[in] operand2 The multiplicand
  * return operand1 * operand2 in 128bits
  */
-__forceinline__ __device__ uint128_t multiply_uint64_uint64(const uint64_t &operand1,
+__forceinline__ __device__ _uint128_t multiply_uint64_uint64(const uint64_t &operand1,
                                                             const uint64_t &operand2) {
-    uint128_t result_;
+    _uint128_t result_;
     result_.lo = operand1 * operand2;
     result_.hi = __umul64hi(operand1, operand2);
     return result_;
@@ -364,7 +364,7 @@ __forceinline__ __device__ void multiply_uint_uint64(const uint64_t *operand1,
                                                      uint32_t uint64_count,
                                                      const uint64_t &operand2,
                                                      uint64_t *result) {
-    uint128_t prod;
+    _uint128_t prod;
     uint64_t temp = 0;
     uint8_t carry = 0;
 
@@ -387,7 +387,7 @@ __forceinline__ __device__ void multiply_uint_uint64(const uint64_t *operand1,
 }
 
 __forceinline__ __device__ void
-divide_uint128_uint64_generic(uint128_t &numerator, const uint64_t &denominator, uint128_t &quotient) {
+divide_uint128_uint64_generic(_uint128_t &numerator, const uint64_t &denominator, _uint128_t &quotient) {
     // Clear quotient. Set it to zero.
     quotient = {0, 0};
 
@@ -408,10 +408,10 @@ divide_uint128_uint64_generic(uint128_t &numerator, const uint64_t &denominator,
     }
 
     // Create temporary space to store mutable copy of denominator.
-    uint128_t shifted_denominator = {0, denominator};
+    _uint128_t shifted_denominator = {0, denominator};
 
     // Create temporary space to store difference calculation.
-    uint128_t difference = {0, 0};
+    _uint128_t difference = {0, 0};
 
     // Shift denominator to bring MSB in alignment with MSB of numerator.
     uint32_t denominator_shift = numerator_bits - denominator_bits;

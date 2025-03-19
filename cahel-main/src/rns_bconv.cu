@@ -138,7 +138,7 @@ __global__ void bconv_matmul_kernel(uint64_t *dst,
         const size_t degree_idx = tid / obase_size;
         const size_t out_prime_idx = tid % obase_size;
 
-        uint128_t accum = base_convert_acc(xi_qiHatInv_mod_qi,
+        _uint128_t accum = base_convert_acc(xi_qiHatInv_mod_qi,
                                            s_QHatModp, out_prime_idx,
                                            n,
                                            ibase_size,
@@ -321,7 +321,7 @@ base_convert_matmul_hps_kernel(uint64_t *dst,
         const size_t degree_idx = tid / obase_size;
         const size_t out_prime_idx = tid % obase_size;
 
-        uint128_t accum = base_convert_acc(xi_qiHatInv_mod_qi,
+        _uint128_t accum = base_convert_acc(xi_qiHatInv_mod_qi,
                                            s_qiHat_mod_pj, out_prime_idx,
                                            n,
                                            ibase_size,
@@ -499,7 +499,7 @@ __global__ static void exact_convert_array_kernel(uint64_t *dst,
         double_t v = 0.0;
         uint64_t rounded_v;
         DModulus t = obase[0];
-        uint128_t inner_prod = {0, 0};
+        _uint128_t inner_prod = {0, 0};
         uint64_t q_mod_t = 0;
 
         for (uint64_t i = 0; i < ibase_size; i++) {
@@ -836,7 +836,7 @@ moddown_kernel(uint64_t *dst,
         size_t twr = tid / n;
         DModulus mod = modulus[twr];
         uint64_t bigPInv_mod_q = mod_switch_factor[twr].operand();
-        uint128_t temp;
+        _uint128_t temp;
         add_uint64_uint64(cx[tid], mod.value(), temp.lo);
         sub_uint64_uint64(temp.lo, delta[tid], temp.lo);
         temp = multiply_uint64_uint64(temp.lo, bigPInv_mod_q);

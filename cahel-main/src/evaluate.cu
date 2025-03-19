@@ -1391,7 +1391,7 @@ __global__ void ciphertext_square_kernel(uint64_t *destination, const uint64_t *
         // d0 <- c0 * c'0
         d0 = multiply_and_barrett_reduce_uint64(c0, c0, mod, ratio);
         // d1 <- c0 * c'1 + c1 * c'0
-        uint128_t prod;
+        _uint128_t prod;
         prod = multiply_uint64_uint64(c0, c1);
         shift_left_uint128(prod, 1, prod);
         d1 = barrett_reduce_uint128_uint64(prod, mod, ratio);
