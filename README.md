@@ -1,4 +1,3 @@
-# 
 #  Lancelot: Towards Compute Efficient Byzantine-Robust Federated Learning within Fully Homomorphic Encryption 
 ### Lancelot Offical Source Code [Nature Machine Intelligence]
 
