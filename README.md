@@ -1,4 +1,7 @@
-# Lancelot-Dev
+# 
+#  Lancelot: Towards Compute Efficient Byzantine-Robust Federated Learning within Fully Homomorphic Encryption 
+### Lancelot Offical Source Code [Nature Machine Intelligence]
+
 This repo is the official repo for [Lancelot: Towards Efficient and Privacy-Preserving Byzantine-Robust Federated Learning within Fully Homomorphic Encryption](https://arxiv.org/abs/2408.06197).
 
 To evaluate Lancelot, we first install HomoMul GPU Accelerator (cahel) and then using our example code in lancelot-main-GPU.
