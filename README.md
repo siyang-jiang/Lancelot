@@ -1,5 +1,5 @@
-#  Lancelot: Towards Compute Efficient Byzantine-Robust Federated Learning within Fully Homomorphic Encryption 
-### Lancelot Offical Source Code [Nature Machine Intelligence]
+#  Lancelot: Towards Compute Efficient Byzantine-Robust Federated Learning within Fully Homomorphic Encryption [Nature Machine Intelligence]
+### Lancelot Offical Source Code 
 
 This repo is the official repo for [Lancelot: Towards Efficient and Privacy-Preserving Byzantine-Robust Federated Learning within Fully Homomorphic Encryption](https://arxiv.org/abs/2408.06197).
 
