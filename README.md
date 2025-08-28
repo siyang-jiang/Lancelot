@@ -10,10 +10,10 @@ To evaluate Lancelot, we first install HomoMul GPU Accelerator (cahel) and then 
 > gcc version >= 9.4.0
 
 ## Update 
-- [08/28/2025] Lancelot is accepted by Nature Machine Intelligence. 🔥🔥🔥
-- We will provide code ocean link soon. 🔥  
-- We have already passed the code testing in the code ocean. 🔥🔥 
-- We provide a new end-to-end script for excuting Lancelot. Please find run.sh. 🔥🔥
+- [2025-08-28] Lancelot has been accepted by Nature Machine Intelligence. 🔥🔥🔥
+- The Code Ocean capsule has passed code verification. 🔥🔥
+- We will share the Code Ocean link soon. 🔥
+- We have added an end-to-end script for running Lancelot (see run.sh). 🔥🔥
 
  Note that specify your GPU architecture (e.g. 75 is for T4, 89 is for 4090) in CMAKE (Line 32 in run.sh). 
 ```
