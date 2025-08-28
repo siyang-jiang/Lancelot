@@ -15,7 +15,7 @@ To evaluate Lancelot, we first install HomoMul GPU Accelerator (cahel) and then 
 - We will share the Code Ocean link soon. 🔥
 - We have added an end-to-end script for running Lancelot (see run.sh). 🔥🔥
 
- Note that specify your GPU architecture (e.g. 75 is for T4, 89 is for 4090) in CMAKE (Line 32 in run.sh). 
+> Note that specify your GPU architecture (e.g. 75 is for T4, 89 is for 4090) in CMAKE (Line 32 in run.sh). 
 ```
  bash run.sh 
 ```
