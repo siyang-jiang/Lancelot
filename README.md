@@ -74,3 +74,15 @@ bash run_lancelot.sh
 
 <!-- ## Results
 ![Results](https://github.com/siyang-jiang/Lancelot-Dev/blob/main/results.jpeg) -->
+
+## Citation
+```
+@article{jiang2025towards,
+  title={Towards compute-efficient Byzantine-robust federated learning with fully homomorphic encryption},
+  author={Jiang, Siyang and Yang, Hao and Xie, Qipeng and Ma, Chuan and Wang, Sen and Liu, Zhe and Xiang, Tao and Xing, Guoliang},
+  journal={Nature Machine Intelligence},
+  pages={1--12},
+  year={2025},
+  publisher={Nature Publishing Group UK London}
+}
+```
