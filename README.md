@@ -1,6 +1,6 @@
 # Lancelot: Byzantine-Robust Federated Learning with Fully Homomorphic Encryption
 
-[![Paper](https://img.shields.io/badge/Paper-Nature%20MI-blue)](https://www.nature.com/articles/s42256-025-01107-6)
+[![Paper](https://img.shields.io/badge/Paper-Nature%20Machine%20Intelligence-blue)](https://www.nature.com/articles/s42256-025-01107-6)
 [![License](https://img.shields.io/badge/License-MIT-green)]()
 
 This repository contains the official implementation of **Lancelot**, a compute-efficient Byzantine-robust federated learning system with fully homomorphic encryption, as published in *Nature Machine Intelligence*.
