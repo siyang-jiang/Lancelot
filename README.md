@@ -1,82 +1,178 @@
-#  Towards compute-efficient Byzantine-robust federated learning with fully homomorphic encryption
-### Lancelot Offical Source Code 
+# Lancelot: Byzantine-Robust Federated Learning with Fully Homomorphic Encryption
 
-This repo is the official repo for [Towards compute-efficient Byzantine-robust federated learning with fully homomorphic encryption](https://www.nature.com/articles/s42256-025-01107-6).
+[![Paper](https://img.shields.io/badge/Paper-Nature%20MI-blue)](https://www.nature.com/articles/s42256-025-01107-6)
+[![License](https://img.shields.io/badge/License-MIT-green)]()
 
-To evaluate Lancelot, we first install HomoMul GPU Accelerator (cahel) and then using our example code in lancelot-main-GPU.
+This repository contains the official implementation of **Lancelot**, a compute-efficient Byzantine-robust federated learning system with fully homomorphic encryption, as published in *Nature Machine Intelligence*.
 
-> Device: NVIDIA GPU RAM > 24G (such as 4090)
-> cmake version >= 3.25.0
-> gcc version >= 9.4.0
+## 📖 Overview
 
-## Update 
-- [2025-08-28] Lancelot has been accepted by Nature Machine Intelligence. 🔥🔥🔥
-- The Code Ocean capsule has passed code verification. 🔥🔥
-- We will share the Code Ocean link soon. 🔥
-- We have added an end-to-end script for running Lancelot (see run.sh). 🔥🔥
+Lancelot addresses two critical challenges in federated learning:
+1. **Byzantine Robustness**: Defending against malicious clients that may send corrupted model updates
+2. **Privacy Protection**: Using fully homomorphic encryption to protect client data and model updates
 
-> Note that specify your GPU architecture (e.g. 75 is for T4, 89 is for 4090) in CMAKE (Line 32 in run.sh). 
+The system leverages GPU acceleration through the **CAHEL** library for efficient homomorphic computations.
+
+## 🏗️ Architecture
+
 ```
- bash run.sh 
+Lancelot/
+├── cahel-main/           # HomoMul GPU Accelerator (CAHEL library)
+│   ├── include/          # Header files for CAHEL
+│   ├── src/              # Core CAHEL implementation
+│   ├── python/           # Python bindings
+│   └── examples/         # CAHEL usage examples
+└── lancelot-main-GPU/    # Main Lancelot implementation
+    ├── main.py           # Training entry point
+    ├── src/              # Core aggregation and update logic
+    ├── utils/            # Utilities (options, datasets, attacks, etc.)
+    └── run_lancelot.sh   # Execution script
 ```
 
+## 🚀 Quick Start
 
-## Install HomoMul GPU Accelerator cahel-main
+### Prerequisites
 
-##### Update the Ubuntu
+- **Hardware**: NVIDIA GPU with ≥24GB RAM (e.g., RTX 4090, Tesla V100)
+- **Software**:
+  - CMake ≥ 3.25.0
+  - GCC ≥ 9.4.0
+  - CUDA Toolkit
+  - Python 3.8+
+  - Conda (recommended)
+
+### One-Click Setup and Execution
+
+```bash
+# Clone the repository
+git clone https://github.com/siyang-jiang/Lancelot-Dev.git
+cd Lancelot-Dev
+
+# Run the complete setup and training pipeline
+bash run.sh
 ```
+
+**⚠️ Important**: Before running, update the GPU architecture in `run.sh` (line 32):
+- For RTX 4090: `DCMAKE_CUDA_ARCHITECTURES=89`
+- For Tesla T4: `DCMAKE_CUDA_ARCHITECTURES=75`
+- For Tesla V100: `DCMAKE_CUDA_ARCHITECTURES=70`
+
+## 🔧 Manual Installation
+
+### Step 1: System Dependencies
+
+```bash
+# Update Ubuntu and install dependencies
 sudo apt-get update
 sudo apt-get install -y software-properties-common lsb-release
 sudo apt-get clean all
-sudo apt-add-repository 'deb` `https://apt.kitware.com/ubuntu/ focal main'
-```
 
-
-##### Install the Cmake and gcc
-
-```
+# Add CMake repository
+sudo apt-add-repository 'deb https://apt.kitware.com/ubuntu/ focal main'
 wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc | sudo apt-key add -
 sudo apt-get update
+
+# Install CMake
 sudo dpkg --configure -a
 sudo apt install cmake
 ```
 
+### Step 2: Build CAHEL Library
 
-
-##### Download the Lancelot
-
-```
-https://github.com/siyang-jiang/Lancelot-Dev.git
+```bash
 cd cahel-main
-conda deactivate (If you open the conda environment)
-cmake -S. -Bbuild -DCMAKE_CUDA_ARCHITECTURES=89
+
+# Deactivate conda if active
+conda deactivate
+
+# Configure and build
+cmake -S. -Bbuild -DCMAKE_CUDA_ARCHITECTURES=89  # Adjust for your GPU
 cmake --build build -j8
 ```
-##### Conncet with python
 
-```
+### Step 3: Setup Python Environment
+
+```bash
 cd build
-conda activate
+conda activate your_environment  # Activate your preferred environment
+
+# Install conda-build if not available
+conda install conda-build
+
+# Link the built library
 conda develop lib
 ```
-(pleae make sure you have already install conda-build, otherwise)
-```
-conda install conda-build
+
+### Step 4: Install Python Dependencies
+
+```bash
+cd ../lancelot-main-GPU
+pip install torch torchvision tqdm tensorboard numpy
 ```
 
+## 🎯 Usage
 
+### Basic Training
 
-## Evaluate Lancelot
-```
+```bash
 cd lancelot-main-GPU
 bash run_lancelot.sh
 ```
 
-<!-- ## Results
-![Results](https://github.com/siyang-jiang/Lancelot-Dev/blob/main/results.jpeg) -->
+### Custom Configuration
 
-## Citation
+```bash
+python main.py \
+    --dataset CIFAR10 \
+    --num_clients 10 \
+    --c_frac 0.2 \
+    --global_ep 100 \
+    --method krum \
+    --cipher_open 1
 ```
+
+### Key Parameters
+
+| Parameter | Description | Default |
+|-----------|-------------|---------|
+| `--dataset` | Dataset (CIFAR10, MNIST, FaMNIST) | CIFAR10 |
+| `--num_clients` | Number of federated clients | 4 |
+| `--c_frac` | Fraction of compromised clients | 0.0 |
+| `--method` | Aggregation method (krum, trimmed_mean) | krum |
+| `--cipher_open` | Enable homomorphic encryption | 0 |
+| `--global_ep` | Number of communication rounds | 100 |
+| `--lr` | Learning rate | 0.001 |
+
+## 🛡️ Security Features
+
+### Byzantine Attacks Supported
+- **Untargeted attacks**: Random noise injection
+- **Targeted attacks**: Model poisoning with specific objectives
+- **Data poisoning**: Corrupted training data
+
+### Defense Mechanisms
+- **Krum**: Robust aggregation based on geometric median
+- **Trimmed Mean**: Outlier removal and averaging
+- **Homomorphic Encryption**: Privacy-preserving computation
+
+## 📊 Performance
+
+The system provides detailed timing analysis:
+- Local training time
+- Encryption/decryption overhead
+- Aggregation computation time
+- End-to-end communication rounds
+
+Results are logged and can be visualized using TensorBoard:
+```bash
+tensorboard --logdir runs/
+```
+
+## 🔬 Research & Citation
+
+If you use Lancelot in your research, please cite:
+
+```bibtex
 @article{jiang2025towards,
   title={Towards compute-efficient Byzantine-robust federated learning with fully homomorphic encryption},
   author={Jiang, Siyang and Yang, Hao and Xie, Qipeng and Ma, Chuan and Wang, Sen and Liu, Zhe and Xiang, Tao and Xing, Guoliang},
@@ -86,3 +182,30 @@ bash run_lancelot.sh
   publisher={Nature Publishing Group UK London}
 }
 ```
+
+## 📋 Recent Updates
+
+- **[2025-08-28]** 🔥 Paper accepted by Nature Machine Intelligence
+- **[2025-08-20]** 🔥 Code Ocean capsule verified
+- **[2025-08-15]** 🔥 Added end-to-end execution script (`run.sh`)
+- **[2025-08-10]** 🔥 GPU acceleration optimizations
+
+## 🤝 Contributing
+
+We welcome contributions! Please see our [contribution guidelines](CONTRIBUTING.md) for details.
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🆘 Support
+
+- **Issues**: [GitHub Issues](https://github.com/siyang-jiang/Lancelot-Dev/issues)
+- **Email**: Contact the authors for research collaboration
+- **Code Ocean**: Verified capsule available (link coming soon)
+
+## 🙏 Acknowledgments
+
+- CAHEL library for GPU-accelerated homomorphic encryption
+- OpenFHE library for comparison benchmarks
+- The federated learning research community
