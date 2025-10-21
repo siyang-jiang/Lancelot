@@ -13,6 +13,13 @@ Lancelot addresses two critical challenges in federated learning:
 
 The system leverages GPU acceleration through the **CAHEL** library for efficient homomorphic computations.
 
+## 📋 Recent Updates
+
+- **[2025-08-28]** 🔥 Paper accepted by Nature Machine Intelligence
+- **[2025-08-20]** 🔥 Code Ocean capsule verified
+- **[2025-08-15]** 🔥 Added end-to-end execution script (`run.sh`)
+- **[2025-08-10]** 🔥 GPU acceleration optimizations
+
 ## 🏗️ Architecture
 
 ```
@@ -183,12 +190,7 @@ If you use Lancelot in your research, please cite:
 }
 ```
 
-## 📋 Recent Updates
 
-- **[2025-08-28]** 🔥 Paper accepted by Nature Machine Intelligence
-- **[2025-08-20]** 🔥 Code Ocean capsule verified
-- **[2025-08-15]** 🔥 Added end-to-end execution script (`run.sh`)
-- **[2025-08-10]** 🔥 GPU acceleration optimizations
 
 ## 🤝 Contributing
 
