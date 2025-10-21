@@ -1,4 +1,4 @@
-# Lancelot: Byzantine-Robust Federated Learning with Fully Homomorphic Encryption
+# Towards Compute Efficient Byzantine-Robust Federated Learning within Fully Homomorphic Encryption
 
 [![Paper](https://img.shields.io/badge/Paper-Nature%20Machine%20Intelligence-blue)](https://www.nature.com/articles/s42256-025-01107-6)
 [![License](https://img.shields.io/badge/License-MIT-green)]()
